@@ -5,6 +5,9 @@ import 'popup_add_page.dart';
 import 'popup_change_page.dart';
 import '../database/database.dart';
 import 'provider/pop_provider.dart';
+import 'provider/pop_add_provider.dart';
+
+// command + . でcontainerなどで要素を囲える。
 
 final queryexecutor = connectionDatabase();
 final database = ScheduleDatabase(queryexecutor);
@@ -28,7 +31,6 @@ class PopupScreen extends ConsumerWidget {
     List scheduleJudgeList = ref.watch(scheduleJudgeListProvider);
     List scheduleStartDayList = ref.watch(scheduleStartDayListProvider);
     List scheduleEndDayList = ref.watch(scheduleEndDayListProvider);
-
 
     scheJudgeFunc(DateTime firstDateController) async{
       await database.getSchedule().then((data){
@@ -147,59 +149,60 @@ class PopupScreen extends ConsumerWidget {
       }
     }
 
-    //ここのfutureBuilder もしくは　Column　にエラー
     Widget buildScheduleList(DateTime firstDateController) {
       if (scheExistJudge == true) {
         return FutureBuilder(
           future: scheGetFunc(firstDateController),
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-            return Column(
-              children: List.generate(
-                scheduleTitleList.length,
-                (index) => SizedBox(
-                  height: 80,
-                  child: CupertinoButton(
-                    onPressed: () async{
-                      final scheduleDataList =  await ref.read(scheduleListDateProvider(firstDateController).future);
-                      final banana = scheduleDataList[index];
-                      Future.delayed(Duration.zero, () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(builder: (context) => PopChangeScreen(
-                            index: banana.id,
-                            firstDate: firstDateController,
-                            scheTitle: banana.title,
-                            scheJudge: banana.judge,
-                            scheStartDate: banana.startDay,
-                            scheEndDate: banana.endDay,
-                            scheContent: banana.content,
-                          )),
-                        );
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 70,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 15),
-                            child: buildTime(
-                              scheduleJudgeList[index], 
-                              scheduleStartDayList[index], 
-                              scheduleEndDayList[index]
+            return SingleChildScrollView(
+              child: Column(
+                children: List.generate(
+                  scheduleTitleList.length,
+                  (index) => SizedBox(
+                    height: 80,
+                    child: CupertinoButton(
+                      onPressed: () async{
+                        final scheduleDataList =  await ref.read(scheduleListDateProvider(firstDateController).future);
+                        final banana = scheduleDataList[index];
+                        Future.delayed(Duration.zero, () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(builder: (context) => PopChangeScreen(
+                              index: banana.id,
+                              firstDate: firstDateController,
+                              scheTitle: banana.title,
+                              scheJudge: banana.judge,
+                              scheStartDate: banana.startDay,
+                              scheEndDate: banana.endDay,
+                              scheContent: banana.content,
+                            )),
+                          );
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 70,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 15),
+                              child: buildTime(
+                                scheduleJudgeList[index], 
+                                scheduleStartDayList[index], 
+                                scheduleEndDayList[index]
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          width: 4,
-                          height: 50,
-                          color: Colors.blue,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Text(scheduleTitleList[index]),
-                        ),
-                      ],
+                          Container(
+                            width: 4,
+                            height: 50,
+                            color: Colors.blue,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Text(scheduleTitleList[index]),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -219,12 +222,6 @@ class PopupScreen extends ConsumerWidget {
             ],
           ),
         );
-        // return const Column(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     Text('予定がありません。'),
-        //   ],
-        // );
       }
     }
 
@@ -267,11 +264,12 @@ class PopupScreen extends ConsumerWidget {
                         }
                         switchFunc();
 
-                        return SingleChildScrollView(
-                          child: FutureBuilder(
-                            future: scheJudgeFunc(newFirstDay),
-                            builder: (BuildContext context, snapshot) {
-                              return Column(
+                        return FutureBuilder(
+                          future: scheJudgeFunc(newFirstDay),
+                          builder: (BuildContext context, snapshot) {
+                            return SizedBox(
+                              height: 600,
+                              child: Column(
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10),
@@ -290,26 +288,51 @@ class PopupScreen extends ConsumerWidget {
                                         ),
                                         CupertinoButton(
                                           child: const Icon(Icons.add),
-                                          onPressed: () {
+                                          onPressed: () async{
                                             ref.read(popSelectedProvider.notifier).state = newFirstDay;
+                                            final now = DateTime.now().hour;
+                                            ref.watch(popSelectedStartShowProvider.notifier).state = DateTime(
+                                              newFirstDay.year, 
+                                              newFirstDay.month, 
+                                              newFirstDay.day, 
+                                              now
+                                            );
+                                            ref.watch(popSelectedEndShowProvider.notifier).state = DateTime(
+                                              newFirstDay.year, 
+                                              newFirstDay.month, 
+                                              newFirstDay.day, 
+                                              now+1
+                                            );
                                             Navigator.push(context, CupertinoPageRoute(builder: (context) => PopAddScreen(
                                               popSelected: ref.read(popSelectedProvider),
                                             )));
+                            
+                                            final dateOfParse = await ref.watch(popSelectedEndDateProvider(DateTime.now().toString()).future);
+                                            final dateTime = DateTime.parse(dateOfParse);
+                                            ref.watch(scheStartDateShowProvider.notifier).state = DateTime(
+                                              dateTime.year, 
+                                              dateTime.month, 
+                                              dateTime.day, 
+                                              dateTime.hour+1
+                                            );
                                           },
                                         ),
                                       ],
                                     ),
                                   ),  
-                                  if(scheExistJudge == true)
-                                    buildScheduleList(newFirstDay),
-                                  if(scheExistJudge == false) 
-                                    Center(
-                                      child: buildScheduleList(newFirstDay),
-                                    ),
+                                  Expanded(
+                                    child: buildScheduleList(newFirstDay),
+                                  ),
+                                  // if(scheExistJudge == true)
+                                  //   buildScheduleList(newFirstDay),
+                                  // if(scheExistJudge == false) 
+                                  //   Expanded(
+                                  //     child: buildScheduleList(newFirstDay),
+                                  //   ),
                                 ],
-                              );
-                            }
-                          ),
+                              ),
+                            );
+                          }
                         );
                       }
                     ),

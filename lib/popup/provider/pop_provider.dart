@@ -29,3 +29,33 @@ final scheduleEndDayListProvider = StateProvider<List>((ref) => []);
 final scheduleContentListProvider = StateProvider<List>((ref) => []);
 
 final popSelectedProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final popSelectedStartShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final popSelectedEndShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
+
+// class PopupPageModel {
+//   final apple = 'apple';
+//   final scheduleTitleList = [];
+// final scheduleJudgeListProvider = StateProvider<List>((ref) => []);
+// final scheduleStartDayListProvider = StateProvider<List>((ref) => []);
+// final scheduleEndDayListProvider = StateProvider<List>((ref) => []);
+// final scheduleContentListProvider = StateProvider<List>((ref) => []);
+// }
+// class PopupPageState extends Notifier<PopupPageModel>{
+//   PopupPageState(){
+//     final melllon = '';
+//   }
+//   addScheduleTitle(){
+//     state.scheduleTitleList freezed
+//   }
+
+//   // print(apple);
+// }
+
+// final popupPageProvider = NotifierProvider<PopupPageState, PopupPageModel>(PopupPageState.new);
+
+// final banana =  new func();
+
+// final fruits = PopupPageState.new;
+
+// final fruits2 = PopupPageModel.new();

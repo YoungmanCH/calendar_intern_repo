@@ -274,6 +274,7 @@ class PopChangeScreen extends ConsumerWidget {
                                         child: CupertinoDatePicker(
                                           backgroundColor: Colors.white,
                                           initialDateTime: DateTime.parse(scheStartDate),
+                                          minuteInterval: 15,
                                           onDateTimeChanged: (DateTime newTime) async{      
                                             String month = newTime.month.toString();
                                             String day = newTime.day.toString();
@@ -395,6 +396,7 @@ class PopChangeScreen extends ConsumerWidget {
                                         child: CupertinoDatePicker(
                                           backgroundColor: Colors.white,
                                           initialDateTime: DateTime.parse(scheEndDate),
+                                          minuteInterval: 15,
                                           onDateTimeChanged: (DateTime newTime) async{      
                                             String month = newTime.month.toString();
                                             String day = newTime.day.toString();

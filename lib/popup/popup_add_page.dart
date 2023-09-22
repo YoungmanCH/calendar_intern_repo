@@ -9,7 +9,10 @@ import 'function/pop_add_function.dart';
 class PopAddScreen extends ConsumerWidget {
   final DateTime popSelected;
 
-  PopAddScreen({required this.popSelected});
+  const PopAddScreen({
+    Key? key,
+    required this.popSelected
+  }) : super(key: key);
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,10 +28,10 @@ class PopAddScreen extends ConsumerWidget {
           leading: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
+              SizedBox(
                 child: CupertinoButton(
-                  child: Icon(CupertinoIcons.clear, color: Colors.white,),
-                  padding: EdgeInsets.only(bottom: 0),
+                  padding: const EdgeInsets.only(bottom: 0),
+                  child: const Icon(CupertinoIcons.clear, color: Colors.white,),
                   onPressed: () => {
                     showCupertinoModalPopup(
                       context: context,
@@ -40,7 +43,7 @@ class PopAddScreen extends ConsumerWidget {
                                 Navigator.push(
                                   context, 
                                   CupertinoPageRoute(
-                                    builder: (context) => HomeScreen(),
+                                    builder: (context) => const HomeScreen(),
                                   ),
                                 );
                                 ref.read(scheStartDataProvider.notifier).state = '';
@@ -49,11 +52,11 @@ class PopAddScreen extends ConsumerWidget {
                                 ref.read(commentAddProvider('')).clear();
                                 ref.read(switchProvider.notifier).state = false;
                               },
-                              child: Text('編集を破棄'),
+                              child: const Text('編集を破棄'),
                             ),
                             CupertinoActionSheetAction(
                               onPressed: () => Navigator.pop(context),
-                              child: Text('キャンセル'),
+                              child: const Text('キャンセル'),
                             ),
                           ],
                         );
@@ -62,40 +65,39 @@ class PopAddScreen extends ConsumerWidget {
                   }
                 ),
               ),
-              Container(
+              const SizedBox(
                 child: Text('予定の追加', style: TextStyle(color: Colors.white,)),
               ),
-              Container(
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10, bottom: 5),
-                  child: CupertinoButton(
-                    child: Text('保存', style: TextStyle(color: Colors.grey, fontSize: 12,)),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-                    color: Colors.white,
-                    onPressed: conditionJudge == false ? null : () async{
-                      Navigator.push(context, CupertinoPageRoute(builder: (context) => HomeScreen()));
-                      final dataSche = await ref.read(datetimeJudgeProvider);
-                      DateTime datetimeJudgement = DateTime(dataSche.year, dataSche.month, dataSche.day);
-                      print('datetimeJudgement: ${datetimeJudgement}');  
+              Padding(
+                padding: const EdgeInsets.only(right: 10, bottom: 5),
+                child: CupertinoButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                  color: Colors.white,
+                  disabledColor: Colors.grey,       
+                  onPressed: conditionJudge == false ? null : () async{
+                    Navigator.push(context, CupertinoPageRoute(builder: (context) => const HomeScreen()));
+                    // final dataSche = await ref.read(datetimeJudgeProvider);
+                    final dataSche = ref.watch(dateTimeJudgeProvider);
+                    DateTime datetimeJudgement = DateTime(dataSche.year, dataSche.month, dataSche.day);
+                    debugPrint('datetimeJudgement: $datetimeJudgement');  
 
-                      final database = ref.read(databaseProvider);
-                      await database.addSchedule(
-                        ref.read(titleAddProvider('')).text,
-                        await ref.read(popSelectedStartDateProvider(popSelected.toString()).future), 
-                        await ref.read(popSelectedEndDateProvider(popSelected.toString()).future), 
-                        ref.read(commentAddProvider('')).text,
-                        datetimeJudgement, 
-                        ref.read(switchProvider.notifier).state
-                      );
-                      database.watchSchedule().listen((data) => print('watchSchedule: ${data}'));
-                      ref.read(scheStartDataProvider.notifier).state = '';
-                      ref.read(scheEndDataProvider.notifier).state = '';
-                      ref.read(titleAddProvider('')).clear();
-                      ref.read(commentAddProvider('')).clear();
-                      ref.read(switchProvider.notifier).state = false;
-                    },
-                    disabledColor: Colors.grey,       
-                  ),
+                    final database = ref.read(databaseProvider);
+                    await database.addSchedule(
+                      ref.read(titleAddProvider('')).text,
+                      await ref.read(popSelectedStartDateProvider(popSelected.toString()).future), 
+                      await ref.read(popSelectedEndDateProvider(popSelected.toString()).future), 
+                      ref.read(commentAddProvider('')).text,
+                      datetimeJudgement, 
+                      ref.read(switchProvider.notifier).state
+                    );
+                    database.watchSchedule().listen((data) => debugPrint('watchSchedule: $data'));
+                    ref.read(scheStartDataProvider.notifier).state = '';
+                    ref.read(scheEndDataProvider.notifier).state = '';
+                    ref.read(titleAddProvider('')).clear();
+                    ref.read(commentAddProvider('')).clear();
+                    ref.read(switchProvider.notifier).state = false;
+                  },
+                  child: const Text('保存', style: TextStyle(color: Colors.grey, fontSize: 12,)),
                 ),
               ),
             ],
@@ -106,22 +108,19 @@ class PopAddScreen extends ConsumerWidget {
             color: const Color.fromARGB(248, 235, 234, 234),
             child: Column(
               children: [
-                Container(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 10),
-                    child: Container(
-                      width: 400,
-                      height: 60,
-                      child: CupertinoTextField(
-                        placeholder: 'タイトルを入力してください',
-                        controller: ref.read(titleAddProvider('')),
-                      ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: SizedBox(
+                    width: 400,
+                    height: 60,
+                    child: CupertinoTextField(
+                      placeholder: 'タイトルを入力してください',
+                      controller: ref.read(titleAddProvider('')),
                     ),
                   ),
                 ),
-                Container(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 40, right: 10, left: 10),
+                Padding(
+                    padding: const EdgeInsets.only(top: 40, right: 10, left: 10),
                     child: Container(
                       width: 600,
                       height: 180,
@@ -129,7 +128,7 @@ class PopAddScreen extends ConsumerWidget {
                       child: Column(
                         children: [
                           Container(
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
                                   color: Colors.grey,
@@ -140,34 +139,28 @@ class PopAddScreen extends ConsumerWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 15),
-                                    child: Container(
-                                      child: Text(
-                                        '終日',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 15),
+                                    child: Text(
+                                      '終日',
+                                      style: TextStyle(
+                                        fontSize: 16,
                                       ),
                                     ),
-                                  ),
                                 ),
-                                Container(
-                                  child: Switch(
-                                    value: switchJudge,
-                                    onChanged: (value) {
-                                      switchJudge = value;
-                                      ref.read(switchProvider.notifier).state = switchJudge;
-                                    },
-                                  ),
+                                Switch(
+                                  value: switchJudge,
+                                  onChanged: (value) {
+                                    switchJudge = value;
+                                    ref.read(switchProvider.notifier).state = switchJudge;
+                                  },
                                 ),
                               ],
                             ),
                           ),
                           CupertinoButton(
                             child: Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
                                     color: Colors.grey,
@@ -178,23 +171,17 @@ class PopAddScreen extends ConsumerWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    child: Container(
-                                      child: Text(
-                                        '開始',
-                                        style: TextStyle(color: Colors.black,)
-                                      ),
-                                    ),
+                                  const Text(
+                                    '開始',
+                                    style: TextStyle(color: Colors.black,)
                                   ),
-                                  Container(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 15),
-                                      child: FutureBuilder(
-                                        future: getStartTimeScheFunc(ref),
-                                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                          return Text(snapshot.data.toString());
-                                        }
-                                      ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: FutureBuilder(
+                                      future: getStartTimeScheFunc(ref),
+                                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                        return Text(snapshot.data.toString());
+                                      }
                                     ),
                                   ),
                                 ],
@@ -205,58 +192,51 @@ class PopAddScreen extends ConsumerWidget {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return Container(
-                                     child: Container(
                                       height: 300,
                                       color: Colors.white,
                                       child: Column(
                                         children: [
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Container(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(left: 10),
-                                                    child:  CupertinoButton(
-                                                      child: Text(
-                                                        'キャンセル',
-                                                        style: TextStyle(
-                                                          color: Colors.blue,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.pop(context, CupertinoPageRoute(
-                                                          builder: (context) => PopAddScreen(popSelected: popSelected),
-                                                        ));
-                                                      }
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 10),
+                                                child:  CupertinoButton(
+                                                  child: const Text(
+                                                    'キャンセル',
+                                                    style: TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context, CupertinoPageRoute(
+                                                      builder: (context) => PopAddScreen(popSelected: popSelected),
+                                                    ));
+                                                  }
                                                 ),
-                                                Container(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(right: 10),
-                                                    child: CupertinoButton(
-                                                      child: Text(
-                                                        '完了',
-                                                        style: TextStyle(
-                                                          color: Colors.blue,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.pop(context, CupertinoPageRoute(
-                                                          builder: (context) => PopAddScreen(popSelected: popSelected),
-                                                        ));
-                                                        ref.read(popSelectedStartDateProvider(popSelected.toString()).future);
-                                                      }
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: CupertinoButton(
+                                                  child: const Text(
+                                                    '完了',
+                                                    style: TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context, CupertinoPageRoute(
+                                                      builder: (context) => PopAddScreen(popSelected: popSelected),
+                                                    ));
+                                                    ref.read(popSelectedStartDateProvider(popSelected.toString()).future);
+                                                  }
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                          Container(
+                                          SizedBox(
                                             height: 200,
                                             child: FutureBuilder(
                                               future: ref.watch(popSelectedStartDateProvider(popSelected.toString()).future),
@@ -265,32 +245,33 @@ class PopAddScreen extends ConsumerWidget {
                                                 DateTime initTime = DateTime.now();
                                                 if(snapshot.hasData) {
                                                   initTime = DateTime.parse(snapshot.data);
-                                                  print('initTime: ${initTime}');
                                                 }else {
                                                   initTime = popSelected;
                                                 }
+
                                                 return CupertinoDatePicker(
                                                   backgroundColor: Colors.white,
                                                   initialDateTime: initTime,
+                                                  minuteInterval: 15,
                                                   onDateTimeChanged: (DateTime newTime) {      
                                                     String month = newTime.month.toString();
                                                     String day = newTime.day.toString();
                                                     String hour = newTime.hour.toString();
                                                     String minute = newTime.minute.toString();
                                                     if (newTime.month < 10) {
-                                                      month = '0${month}';
+                                                      month = '0$month';
                                                     }
                                                     if (newTime.day < 10) {
-                                                      day = '0${day}';
+                                                      day = '0$day';
                                                     }
                                                     if (newTime.hour < 10) {
-                                                      hour = '0${hour}';
+                                                      hour = '0$hour';
                                                     }
                                                     if (newTime.minute < 10) {
-                                                      minute = '0${minute}';
+                                                      minute = '0$minute';
                                                     }
-                                                    
-                                                    ref.read(scheStartDataProvider.notifier).state = '${popSelected.year}-${month}-${day} ${hour}:${minute}';
+                                                    ref.watch(scheStartDateShowProvider.notifier).state = DateTime(popSelected.year, newTime.month, newTime.day, newTime.hour+1);
+                                                    ref.read(scheStartDataProvider.notifier).state = '${popSelected.year}-$month-$day $hour:$minute';
                                                   },
                                                   use24hFormat: true,
                                                 );
@@ -299,96 +280,80 @@ class PopAddScreen extends ConsumerWidget {
                                           ), 
                                         ],
                                       ),
-                                    ),
-                                  );
-                                }
+                                    );
+                                  }
                               );
                             }
                           ),
                           CupertinoButton(
-                            child: Container(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    child: Container(
-                                      child: Text(
-                                        '終了',
-                                        style: TextStyle(color: Colors.black,)
-                                      ),
-                                    ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  '終了',
+                                  style: TextStyle(color: Colors.black,)
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 15),
+                                  child: FutureBuilder(
+                                    future: getEndTimeScheFunc(ref),
+                                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                      return Text(snapshot.data.toString());
+                                    }
                                   ),
-                                  Container(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 15),
-                                      child: FutureBuilder(
-                                        future: getEndTimeScheFunc(ref),
-                                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                          return Text(snapshot.data.toString());
-                                        }
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             onPressed: () {
                               showCupertinoModalPopup(
                                 context: context,
                                 builder: (BuildContext context) {
                                   return Container(
-                                     child: Container(
                                       height: 300,
                                       color: Colors.white,
                                       child: Column(
                                         children: [
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Container(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(left: 10),
-                                                    child:  CupertinoButton(
-                                                      child: Text(
-                                                        'キャンセル',
-                                                        style: TextStyle(
-                                                          color: Colors.blue,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.pop(context, CupertinoPageRoute(
-                                                          builder: (context) => PopAddScreen(popSelected: popSelected),
-                                                        ));
-                                                      }
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 10),
+                                                child:  CupertinoButton(
+                                                  child: const Text(
+                                                    'キャンセル',
+                                                    style: TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context, CupertinoPageRoute(
+                                                      builder: (context) => PopAddScreen(popSelected: popSelected),
+                                                    ));
+                                                  }
                                                 ),
-                                                Container(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(right: 10),
-                                                    child: CupertinoButton(
-                                                      child: Text(
-                                                        '完了',
-                                                        style: TextStyle(
-                                                          color: Colors.blue,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                      onPressed: () async{
-                                                        Navigator.pop(context, CupertinoPageRoute(
-                                                          builder: (context) => PopAddScreen(popSelected: popSelected),
-                                                        ));
-                                                        await ref.read(popSelectedEndDateProvider(popSelected.toString()).future);
-                                                      }
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 10),
+                                                child: CupertinoButton(
+                                                  child: const Text(
+                                                    '完了',
+                                                    style: TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
+                                                  onPressed: () async{
+                                                    Navigator.pop(context, CupertinoPageRoute(
+                                                      builder: (context) => PopAddScreen(popSelected: popSelected),
+                                                    ));
+                                                    await ref.read(popSelectedEndDateProvider(popSelected.toString()).future);
+                                                  }
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                          Container(
+                                          SizedBox(
                                             height: 200,
                                             child: FutureBuilder(
                                               future: getEndTimeScheFunc(ref),
@@ -396,32 +361,36 @@ class PopAddScreen extends ConsumerWidget {
                                                 DateTime initTime = DateTime.now();
                                                 if(snapshot.hasData) {
                                                   initTime = DateTime.parse(snapshot.data);
-                                                  print('initTime: ${initTime}');
                                                 }else {
                                                   initTime = popSelected;
                                                 }
+                                                DateTime dateTime = ref.watch(scheStartDateShowProvider);
+                                                print('dateTime: $dateTime');
+                                                initTime = dateTime;
                                                 return CupertinoDatePicker(
                                                   backgroundColor: Colors.white,
                                                   initialDateTime: initTime,
+                                                  minuteInterval: 15,
+                                                  minimumDate: DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour),
                                                   onDateTimeChanged: (DateTime newTime) async{    
                                                     String month = newTime.month.toString();
                                                     String day = newTime.day.toString();
                                                     String hour = newTime.hour.toString();
                                                     String minute = newTime.minute.toString();
                                                     if (newTime.month < 10) {
-                                                      month = '0${month}';
+                                                      month = '0$month';
                                                     }
                                                     if (newTime.day < 10) {
-                                                      day = '0${day}';
+                                                      day = '0$day';
                                                     }
                                                     if (newTime.hour < 10) {
-                                                      hour = '0${hour}';
+                                                      hour = '0$hour';
                                                     }
                                                     if (newTime.minute < 10) {
-                                                      minute = '0${minute}';
+                                                      minute = '0$minute';
                                                     }
                                                     
-                                                    ref.read(scheEndDataProvider.notifier).state = '${popSelected.year}-${month}-${day} ${hour}:${minute}';
+                                                    ref.read(scheEndDataProvider.notifier).state = '${popSelected.year}-$month-$day $hour:$minute';
                                                   },
                                                   use24hFormat: true,
                                                 );
@@ -430,8 +399,7 @@ class PopAddScreen extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  );
+                                    );
                                 }
                               );
                             }
@@ -440,10 +408,8 @@ class PopAddScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
                     child: Container(
                       color: Colors.white,
                       width: 400,
@@ -455,7 +421,6 @@ class PopAddScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                ),
               ],
             ),     
           ),
