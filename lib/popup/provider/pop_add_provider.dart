@@ -12,15 +12,15 @@ final commentAddProvider =
   return TextEditingController(text: scheContent);
 });
 final conditionJudgeProvider = StateProvider<bool>((ref) => false);
-final datetimeJudgeProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 final popSelectedStartDateProvider = FutureProvider.family<String, String>(
   (ref, scheStartDate) async {
-    DateTime datetimeStart = await DateTime.parse(scheStartDate);
-    final scheStartData = await ref.watch(scheStartDataProvider);
+    DateTime datetimeStart = DateTime.parse(scheStartDate);
+    final scheStartData = ref.watch(scheStartDataProvider);
     if (scheStartData != '') {
-      datetimeStart = await DateTime.parse(scheStartData);
+      datetimeStart = DateTime.parse(scheStartData);
     }
+    int yearInit = datetimeStart.year;
     int monthInit = datetimeStart.month;
     int dayInit = datetimeStart.day;
     int hourInit = datetimeStart.hour;
@@ -44,8 +44,14 @@ final popSelectedStartDateProvider = FutureProvider.family<String, String>(
 
     String datetimeData = '${datetimeStart.year}-$month-$day $hour:$minute';
 
-    ref.watch(datetimeJudgeProvider.notifier).state =
-        DateTime(datetimeStart.year, monthInit, dayInit, hourInit, minuteInit);
+    ref.watch(dateTimeJudgeProvider.notifier).updateDateTime(
+      yearInit, 
+      monthInit,
+      dayInit,
+      hourInit,
+      minuteInit,
+    );
+
     if (ref.watch(switchProvider) == true) {
       datetimeData = '${datetimeStart.year}-$month-$day';
     }
@@ -55,11 +61,12 @@ final popSelectedStartDateProvider = FutureProvider.family<String, String>(
 
 final popSelectedEndDateProvider = FutureProvider.family<String, String>(
   (ref, scheEndDate) async {
-    DateTime datetimeEnd = await DateTime.parse(scheEndDate);
-    final scheEndData = await ref.watch(scheEndDataProvider);
+    DateTime datetimeEnd = DateTime.parse(scheEndDate);
+    final scheEndData = ref.watch(scheEndDataProvider);
     if (scheEndData != '') {
-      datetimeEnd = await DateTime.parse(scheEndData);
+      datetimeEnd = DateTime.parse(scheEndData);
     }
+    int yearInit = datetimeEnd.year;
     int monthInit = datetimeEnd.month;
     int dayInit = datetimeEnd.day;
     int hourInit = datetimeEnd.hour;
@@ -81,8 +88,13 @@ final popSelectedEndDateProvider = FutureProvider.family<String, String>(
       minute = '0$minuteInit';
     }
     String datetimeData = '${datetimeEnd.year}-$month-$day $hour:$minute';
-    ref.watch(datetimeJudgeProvider.notifier).state =
-        DateTime(datetimeEnd.year, monthInit, dayInit, hourInit, minuteInit);
+    ref.watch(dateTimeJudgeProvider.notifier).updateDateTime(
+      yearInit, 
+      monthInit,
+      dayInit,
+      hourInit,
+      minuteInit,
+    );
     if (ref.watch(switchProvider) == true) {
       datetimeData = '${datetimeEnd.year}-$month-$day';
     }
@@ -91,4 +103,23 @@ final popSelectedEndDateProvider = FutureProvider.family<String, String>(
 );
 
 final scheStartDataProvider = StateProvider<String>((ref) => '');
+final scheStartDateShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final scheEndDataProvider = StateProvider<String>((ref) => '');
+
+
+final dateTimeJudgeProvider = NotifierProvider<DateTimeJudgeNotifier, DateTime>(DateTimeJudgeNotifier.new);
+
+class DateTimeJudgeNotifier extends Notifier <DateTime>{
+
+  //build() コードが初期化コードである。
+  @override
+  DateTime build() {
+    return DateTime.now();
+  }
+
+  updateDateTime(int year, int month, int day, int hour, int minute) {
+    // state = DateTime(year, month, day, hour, minute);
+    return DateTime(year, month, day, hour, minute);
+  }
+}
+

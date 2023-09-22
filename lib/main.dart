@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'start_page.dart';
@@ -19,6 +18,32 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//Providerの中で、初期化処理、stateProviderの値を変更してはならない。
+
+//laund.json file にて　 "noDebug": true,
+
+//NotifierProvider
+
+//StateProviderの値を　.notifier.stateで値を変更してもbuildされるまで値が変更されない。
+
+// //大元
+// class CalendarService {
+
+//   //使用機能を切り出す。
+//   addSchedule();
+//   changeSchedule();
+
+//   //Pageで機能を呼び出す。
+//   calendarService.addSchedule();
+// }
+
+//ViewPageのみClassを使用するとわかりやすい。
+
+//MVC
+// StateNotifier Page毎に状態を管理させる。
+//StateNotifierはStateProviderと違って、関数を持つことができ、またクラスの一種である。
+// Page = View　見た目
+//Controller = Function,Provider 機能
 
 
 

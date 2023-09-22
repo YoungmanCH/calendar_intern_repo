@@ -18,13 +18,13 @@ Future<void> textSettingFunc(
 }
 
 Future<String> getStartTimeScheFunc(WidgetRef ref) async {
-  final startDate = ref.watch(popSelectedProvider);
+  final startDate = ref.watch(popSelectedStartShowProvider);
   return await ref
       .watch(popSelectedStartDateProvider(startDate.toString()).future);
 }
 
 Future<String> getEndTimeScheFunc(WidgetRef ref) async {
-  final popSelected = ref.watch(popSelectedProvider);
+  final endDate = ref.watch(popSelectedEndShowProvider);
   return await ref
-      .watch(popSelectedEndDateProvider(popSelected.toString()).future);
+      .watch(popSelectedEndDateProvider(endDate.toString()).future);
 }
