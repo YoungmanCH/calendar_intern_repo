@@ -88,7 +88,7 @@ final popSelectedEndDateProvider = FutureProvider.family<String, String>(
       minute = '0$minuteInit';
     }
     String datetimeData = '${datetimeEnd.year}-$month-$day $hour:$minute';
-    ref.watch(dateTimeJudgeProvider.notifier).updateDateTime(
+    ref.watch(dateTimeJudgeProvider.notifier).updateDateTime2(
       yearInit, 
       monthInit,
       dayInit,
@@ -104,13 +104,13 @@ final popSelectedEndDateProvider = FutureProvider.family<String, String>(
 
 final scheStartDataProvider = StateProvider<String>((ref) => '');
 final scheStartDateShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final scheEndDateShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final scheEndDataProvider = StateProvider<String>((ref) => '');
 
 
 final dateTimeJudgeProvider = NotifierProvider<DateTimeJudgeNotifier, DateTime>(DateTimeJudgeNotifier.new);
 
-class DateTimeJudgeNotifier extends Notifier <DateTime>{
-
+class DateTimeJudgeNotifier extends Notifier<DateTime>{
   //build() コードが初期化コードである。
   @override
   DateTime build() {
@@ -120,6 +120,29 @@ class DateTimeJudgeNotifier extends Notifier <DateTime>{
   updateDateTime(int year, int month, int day, int hour, int minute) {
     // state = DateTime(year, month, day, hour, minute);
     return DateTime(year, month, day, hour, minute);
+  }
+  updateDateTime2(int year, int month, int day, int hour, int minute) {
+    // state = DateTime(year, month, day, hour, minute);
+    return DateTime(year, month, day, hour, minute);
+  }
+}
+
+
+final textSwitchProvider = FutureProvider.family<bool, bool>((ref, judge) async {
+  return ref.watch(switchJudgeProvider.notifier).updateJudge(judge);
+});
+
+final switchJudgeProvider = NotifierProvider<SwitchJudgeNotifier, bool>(SwitchJudgeNotifier.new);
+
+class SwitchJudgeNotifier extends Notifier<bool>{
+
+  @override
+  bool build() {
+    return false;
+  }
+
+  updateJudge(bool judge) {
+    return judge;
   }
 }
 
