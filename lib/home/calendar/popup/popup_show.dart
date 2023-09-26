@@ -3,102 +3,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'popup_add_page.dart';
 import 'popup_change_page.dart';
-import '../database/database.dart';
+import '../../../database/database.dart';
 import 'provider/pop_provider.dart';
 import 'provider/pop_add_provider.dart';
+import 'provider/pop_change_provider.dart';
+import 'function/show/pop_show_function.dart';
 
 // command + . でcontainerなどで要素を囲える。
 
 final queryexecutor = connectionDatabase();
 final database = ScheduleDatabase(queryexecutor);
 
-class PopupScreen extends ConsumerWidget {
-  final DateTime selectedDate;
-
-  const PopupScreen({
-    Key? key,
-    required this.selectedDate, 
-  }) : super(key: key);
-
-  popupFunction(BuildContext context, WidgetRef ref) async{
-
-    String weekPop = '';
-    Color weekColor = Colors.black;
-    int judgeWeekPop = selectedDate.weekday;
-
-    bool scheExistJudge = false;
-    List scheduleTitleList = ref.watch(scheduleTitleListProvider);
-    List scheduleJudgeList = ref.watch(scheduleJudgeListProvider);
-    List scheduleStartDayList = ref.watch(scheduleStartDayListProvider);
-    List scheduleEndDayList = ref.watch(scheduleEndDayListProvider);
-
-    scheJudgeFunc(DateTime firstDateController) async{
-      await database.getSchedule().then((data){
-        final dates = data.map((record) => record.date).toList();                  
-        if (dates.contains(firstDateController)) {
-          ref.read(scheExistJudgeProvider.notifier).state = true;
-          scheExistJudge = ref.watch(scheExistJudgeProvider);
-        }else {
-          ref.read(scheExistJudgeProvider.notifier).state = false;
-          scheExistJudge = ref.watch(scheExistJudgeProvider);
-        }
-      });
-    }
-    
-    //祝日の際にカラー変更は未設定なので、後でやりましょう。
-    void switchFunc() {
-
-      switch (judgeWeekPop){
-        case 1:
-          weekPop = '月';
-          weekColor = Colors.black;
-          break;
-        case 2:
-          weekPop = '火';
-          weekColor = Colors.black;
-          break;
-        case 3:
-          weekPop = '水';
-          weekColor = Colors.black;
-          break;
-        case 4:
-          weekPop = '木';
-          weekColor = Colors.black;
-          break;
-        case 5:
-          weekPop = '金';
-          weekColor = Colors.black;
-          break;
-        case 6:
-          weekPop = '土';
-          weekColor = Colors.blue;
-          break;
-        case 7:
-          weekPop = '日';
-          weekColor = Colors.red;
-          break;
-        default: 
-          debugPrint('error about firstDay');
-          break;
-      }
-    }
-    switchFunc();
-
-    Future scheGetFunc(DateTime firstDateController) async {
-      ref.read(scheduleTitleListProvider.notifier).state = await database.getScheduleTitle(firstDateController);
-      scheduleTitleList = ref.read(scheduleTitleListProvider);
-
-      ref.read(scheduleJudgeListProvider.notifier).state = await database.getScheduleJudge(firstDateController);
-      scheduleJudgeList = ref.read(scheduleJudgeListProvider.notifier).state;
+popupController(BuildContext context, WidgetRef ref) async{
+  final year = ref.watch(setYearProvider);
+  final month = ref.watch(setMonthProvider);
+  final day = ref.watch(setDayProvider);
+  DateTime catchSchedule = DateTime(year, month, day);
+  final selectedDate = ref.watch(scheduleCatchProvider(catchSchedule));
+  List scheduleTitleList = ref.watch(scheduleTitleListProvider);
+  List scheduleJudgeList = ref.watch(scheduleJudgeListProvider);
+  List scheduleStartDayList = ref.watch(scheduleStartDayListProvider);
+  List scheduleEndDayList = ref.watch(scheduleEndDayListProvider);
 
 
-      ref.read(scheduleStartDayListProvider.notifier).state = await database.getScheduleStartDay(firstDateController);
-      scheduleStartDayList = ref.read(scheduleStartDayListProvider.notifier).state;
+   database.watchSchedule().listen((data) => debugPrint('watchSchedule: $data'));
 
 
-      ref.read(scheduleEndDayListProvider.notifier).state = await database.getScheduleEndDay(firstDateController);
-      scheduleEndDayList = ref.read(scheduleEndDayListProvider.notifier).state;
-    }
+  Future scheGetFunc(DateTime firstDateController) async {
+    ref.watch(scheduleTitleListProvider.notifier).state = await database.getScheduleTitle(firstDateController);
+    scheduleTitleList = ref.watch(scheduleTitleListProvider);
+
+    ref.watch(scheduleJudgeListProvider.notifier).state = await database.getScheduleJudge(firstDateController);
+    scheduleJudgeList = ref.watch(scheduleJudgeListProvider.notifier).state;
+
+    ref.watch(scheduleStartDayListProvider.notifier).state = await database.getScheduleStartDay(firstDateController);
+    scheduleStartDayList = ref.watch(scheduleStartDayListProvider.notifier).state;
+
+    ref.watch(scheduleEndDayListProvider.notifier).state = await database.getScheduleEndDay(firstDateController);
+    scheduleEndDayList = ref.watch(scheduleEndDayListProvider.notifier).state;
+  }
+  
 
     Widget buildTime(bool judge, String start, String end) {
       if(judge == false) {
@@ -150,7 +94,7 @@ class PopupScreen extends ConsumerWidget {
     }
 
     Widget buildScheduleList(DateTime firstDateController) {
-      if (scheExistJudge == true) {
+      if (ref.watch(scheExistJudgeProvider) == true) {
         return FutureBuilder(
           future: scheGetFunc(firstDateController),
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
@@ -177,6 +121,23 @@ class PopupScreen extends ConsumerWidget {
                               scheContent: banana.content,
                             )),
                           );
+                          final fruits = DateTime.parse(banana.startDay);
+                          final fruits2 = DateTime.parse(banana.endDay);
+                          ref.watch(popSelectedStartShowProvider.notifier).state = DateTime(
+                            fruits.year, 
+                            fruits.month, 
+                            fruits.day,
+                            fruits.hour,
+                            fruits.minute,
+                          );
+                          ref.watch(popSelectedEndShowProvider.notifier).state = DateTime(
+                            fruits2.year, 
+                            fruits2.month, 
+                            fruits2.day,
+                            fruits2.hour,
+                            fruits2.minute,
+                          );
+                          ref.watch(switchChangeProvider.notifier).state = banana.judge;
                         });
                       },
                       child: Row(
@@ -245,11 +206,61 @@ class PopupScreen extends ConsumerWidget {
                     child: Center(
                     child: PageView.builder(
                       controller: ref.watch(pageControllerProvider2),
-                      itemBuilder: (context, index){
+                      itemBuilder: (context, index) {
                         index = index - DateTime.now().month + 1;
                         final DateTime newFirstDay  = selectedDate.add(Duration(days: index));
-                        scheJudgeFunc(newFirstDay);
-                        ref.watch(selectedWeekdayProvider(newFirstDay.weekday));
+                        print('newFirstDay: $newFirstDay');
+                        scheJudgeFunc(ref, newFirstDay);
+                        ref.watch(judgeWeekPopProvider.notifier).state = newFirstDay.weekday;
+
+
+
+
+
+
+
+
+
+
+
+
+                        // bool judgeHoliday = ref.watch(holidayJudgeProvider);
+                        // //この下のコードは、実行されたりされなかったりするため、不完全である。
+                        // //やりたいこと処理は、ポップアップを横移動した際に祝日の場合、テキストカラーを赤色にしたい！
+
+                          //おそらくbuildの問題。関数を作成し呼び出すタイミングがbuildの後ではなく前にしなければならないのかも。
+
+                          //後で、return 文よりも前に以下のコードを書くことで、治るかもしれない。ただ、nwFirstDayhはProviderで管理できるように変更する必要がある。
+
+
+
+                        // ref.watch(holidaysProvider(newFirstDay)).when(
+                        //   loading: () => (),
+                        //   error: (error, stackTrace) => debugPrint('error: $error, $stackTrace'),
+                        //   data: (holidayList) {
+                        //     final date = DateTime(newFirstDay.year, newFirstDay.month, newFirstDay.day);
+                        //     String dateMonth = date.month.toString();
+                        //     String dateDay = date.day.toString();
+                        //     if(date.month < 10) {
+                        //       dateMonth = '0${date.month}';
+                        //     }
+                        //     if(date.day < 10) {
+                        //       dateDay = '0${date.day}';
+                        //     }
+                        //     final dateJudge = '${date.year}-$dateMonth-$dateDay';
+                        //     if(holidayList.contains(dateJudge)) {
+                        //       judgeHoliday = true;
+                        //       // ref.watch(holidayJudgeProvider.notifier).state = true;
+                        //     }
+                        //   }
+                        // );
+                        // ref.watch(holidayJudgeProvider.notifier).state = judgeHoliday;
+
+
+
+
+
+                        // ref.watch(selectedWeekdayProvider(newFirstDay.weekday));
                         String newMonthPop = '';
                         String newDatePop = '';
                         if (newFirstDay.month < 10) {
@@ -262,10 +273,10 @@ class PopupScreen extends ConsumerWidget {
                         } else {
                           newDatePop = '${newFirstDay.day}';
                         }
-                        switchFunc();
+                        switchFunc(ref);
 
                         return FutureBuilder(
-                          future: scheJudgeFunc(newFirstDay),
+                          future: scheJudgeFunc(ref, newFirstDay),
                           builder: (BuildContext context, snapshot) {
                             return SizedBox(
                               height: 600,
@@ -279,41 +290,51 @@ class PopupScreen extends ConsumerWidget {
                                         Padding(
                                           padding: const EdgeInsets.only(left: 20),
                                           child: Text(
-                                            '${newFirstDay.year}/$newMonthPop/$newDatePop($weekPop)',
+                                            '${newFirstDay.year}/$newMonthPop/$newDatePop(${ref.watch(weekPopProvider)})',
+                                            // '${newFirstDay.year}/$newMonthPop/$newDatePop($weekPop)',
                                             style: TextStyle(
                                               fontSize: 18,
-                                              color: weekColor,
+                                              color: ref.watch(weekColorProvider),
+                                              // color: weekColor,
                                             ),
                                           ),
                                         ),
                                         CupertinoButton(
                                           child: const Icon(Icons.add),
                                           onPressed: () async{
-                                            ref.read(popSelectedProvider.notifier).state = newFirstDay;
+                                            ref.watch(popSelectedProvider.notifier).state = newFirstDay;
                                             final now = DateTime.now().hour;
                                             ref.watch(popSelectedStartShowProvider.notifier).state = DateTime(
                                               newFirstDay.year, 
                                               newFirstDay.month, 
                                               newFirstDay.day, 
-                                              now
+                                              now,
                                             );
                                             ref.watch(popSelectedEndShowProvider.notifier).state = DateTime(
                                               newFirstDay.year, 
                                               newFirstDay.month, 
                                               newFirstDay.day, 
-                                              now+1
+                                              now+1,
                                             );
                                             Navigator.push(context, CupertinoPageRoute(builder: (context) => PopAddScreen(
-                                              popSelected: ref.read(popSelectedProvider),
+                                              popSelected: ref.watch(popSelectedProvider),
                                             )));
                             
-                                            final dateOfParse = await ref.watch(popSelectedEndDateProvider(DateTime.now().toString()).future);
-                                            final dateTime = DateTime.parse(dateOfParse);
+                                            final dateOfParseStart = await ref.watch(popSelectedStartDateProvider(DateTime.now().toString()).future);
+                                            final dateOfParseEnd = await ref.watch(popSelectedEndDateProvider(DateTime.now().toString()).future);
+                                            final dateTimeStart = DateTime.parse(dateOfParseStart);
+                                            final dateTimeEnd = DateTime.parse(dateOfParseEnd);
                                             ref.watch(scheStartDateShowProvider.notifier).state = DateTime(
-                                              dateTime.year, 
-                                              dateTime.month, 
-                                              dateTime.day, 
-                                              dateTime.hour+1
+                                              dateTimeStart.year, 
+                                              dateTimeStart.month, 
+                                              dateTimeStart.day, 
+                                              dateTimeStart.hour,
+                                            );
+                                            ref.watch(scheEndDateShowProvider.notifier).state = DateTime(
+                                              dateTimeEnd.year, 
+                                              dateTimeEnd.month, 
+                                              dateTimeEnd.day, 
+                                              dateTimeEnd.hour+1,
                                             );
                                           },
                                         ),
@@ -323,12 +344,6 @@ class PopupScreen extends ConsumerWidget {
                                   Expanded(
                                     child: buildScheduleList(newFirstDay),
                                   ),
-                                  // if(scheExistJudge == true)
-                                  //   buildScheduleList(newFirstDay),
-                                  // if(scheExistJudge == false) 
-                                  //   Expanded(
-                                  //     child: buildScheduleList(newFirstDay),
-                                  //   ),
                                 ],
                               ),
                             );
@@ -345,21 +360,3 @@ class PopupScreen extends ConsumerWidget {
       },
     );
   }
-
-  @override
-  Widget build (BuildContext context, WidgetRef ref) {
-
-    return CupertinoApp(
-      home: CupertinoPageScaffold(
-        child: Center(
-          child: CupertinoButton(
-            child: const Text('Text'),
-            onPressed: () {
-              debugPrint('おまけ');
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}

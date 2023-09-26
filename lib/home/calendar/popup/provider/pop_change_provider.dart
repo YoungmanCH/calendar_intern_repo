@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../database/database.dart';
+import '../../../../database/database.dart';
 
 final scheTitleListProvider =
     FutureProvider.family<List, DateTime>((ref, firstDate) async {
@@ -21,15 +21,15 @@ final commentEditingProvider =
 
 final switchChangeProvider = StateProvider<bool>((ref) => false);
 final conditionJudgeChangeProvider = StateProvider<bool>((ref) => false);
-final datetimeJudgeChangeProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 final popSelectedChangeStartDateProvider =
     FutureProvider.family<String, String>((ref, scheStartDate) async {
-  DateTime datetimeStart = await DateTime.parse(scheStartDate);
-  final scheStartData = await ref.watch(scheStartDataChangeProvider);
+  DateTime datetimeStart = DateTime.parse(scheStartDate);
+  final scheStartData = ref.watch(scheStartDataChangeProvider);
   if (scheStartData != '') {
-    datetimeStart = await DateTime.parse(scheStartData);
+    datetimeStart = DateTime.parse(scheStartData);
   }
+  int yearInit = datetimeStart.year;
   int monthInit = datetimeStart.month;
   int dayInit = datetimeStart.day;
   int hourInit = datetimeStart.hour;
@@ -52,11 +52,17 @@ final popSelectedChangeStartDateProvider =
   }
   String datetimeData =
       '${datetimeStart.year}-$month-$day $hour:$minute';
+
+  ref.watch(dateTimeJudgeChangeProvider.notifier).updateDateTime(
+    yearInit, 
+    monthInit,
+    dayInit,
+    hourInit,
+    minuteInit,
+  );  
   if (ref.watch(switchChangeProvider) == true) {
     datetimeData = '${datetimeStart.year}-$month-$day';
   }
-  ref.read(datetimeJudgeChangeProvider.notifier).state =
-      DateTime(datetimeStart.year, monthInit, dayInit, hourInit, minuteInit);
 
   // ref.invalidate(); //FutureProviderの値を更新する際に使用される。
   // datetimeJudge = DateTime(datetimeStart.year, monthInit, dayInit, hourInit, minuteInit);
@@ -66,11 +72,12 @@ final popSelectedChangeStartDateProvider =
 
 final popSelectedChangeEndDateProvider =
     FutureProvider.family<String, String>((ref, scheEndDate) async {
-  DateTime datetimeEnd = await DateTime.parse(scheEndDate);
-  final scheEndData = await ref.watch(scheEndDataChangeProvider);
+  DateTime datetimeEnd = DateTime.parse(scheEndDate);
+  final scheEndData = ref.watch(scheEndDataChangeProvider);
   if (scheEndData != '') {
-    datetimeEnd = await DateTime.parse(scheEndData);
+    datetimeEnd = DateTime.parse(scheEndData);
   }
+  int yearInit = datetimeEnd.year;
   int monthInit = datetimeEnd.month;
   int dayInit = datetimeEnd.day;
   int hourInit = datetimeEnd.hour;
@@ -92,6 +99,13 @@ final popSelectedChangeEndDateProvider =
     minute = '0$minuteInit';
   }
   String datetimeData = '${datetimeEnd.year}-$month-$day $hour:$minute';
+    ref.watch(dateTimeJudgeChangeProvider.notifier).updateDateTime(
+    yearInit, 
+    monthInit,
+    dayInit,
+    hourInit,
+    minuteInit,
+  ); 
   if (ref.watch(switchChangeProvider) == true) {
     datetimeData = '${datetimeEnd.year}-$month-$day';
   }
@@ -100,3 +114,17 @@ final popSelectedChangeEndDateProvider =
 
 final scheStartDataChangeProvider = StateProvider<String>((ref) => '');
 final scheEndDataChangeProvider = StateProvider<String>((ref) => '');
+
+final dateTimeJudgeChangeProvider = NotifierProvider<DateTimeJudgeChangeNotifier, DateTime>(DateTimeJudgeChangeNotifier.new);
+class DateTimeJudgeChangeNotifier extends Notifier <DateTime>{
+
+  @override
+  DateTime build() {
+    return DateTime.now();
+  }
+
+  updateDateTime(int year, int month, int day, int hour, int minute) {
+    // state = DateTime(year, month, day, hour, minute);
+    return DateTime(year, month, day, hour, minute);
+  }
+}
