@@ -114,6 +114,8 @@ final popSelectedChangeEndDateProvider =
 
 final scheStartDataChangeProvider = StateProvider<String>((ref) => '');
 final scheEndDataChangeProvider = StateProvider<String>((ref) => '');
+final scheStartDateChangeShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final scheEndDateChangeShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 final dateTimeJudgeChangeProvider = NotifierProvider<DateTimeJudgeChangeNotifier, DateTime>(DateTimeJudgeChangeNotifier.new);
 class DateTimeJudgeChangeNotifier extends Notifier <DateTime>{
@@ -128,3 +130,5 @@ class DateTimeJudgeChangeNotifier extends Notifier <DateTime>{
     return DateTime(year, month, day, hour, minute);
   }
 }
+
+final databaseGetDateProvider = StateProvider<DateTime>((ref) => DateTime.now());

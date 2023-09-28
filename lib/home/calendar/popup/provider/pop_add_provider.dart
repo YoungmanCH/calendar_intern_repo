@@ -126,23 +126,3 @@ class DateTimeJudgeNotifier extends Notifier<DateTime>{
     return DateTime(year, month, day, hour, minute);
   }
 }
-
-
-final textSwitchProvider = FutureProvider.family<bool, bool>((ref, judge) async {
-  return ref.watch(switchJudgeProvider.notifier).updateJudge(judge);
-});
-
-final switchJudgeProvider = NotifierProvider<SwitchJudgeNotifier, bool>(SwitchJudgeNotifier.new);
-
-class SwitchJudgeNotifier extends Notifier<bool>{
-
-  @override
-  bool build() {
-    return false;
-  }
-
-  updateJudge(bool judge) {
-    return judge;
-  }
-}
-

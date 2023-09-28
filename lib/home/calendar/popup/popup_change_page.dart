@@ -25,20 +25,14 @@ final database = ScheduleDatabase(queryexecutor);
 
 class PopChangeScreen extends ConsumerWidget {
   final int index;
-  final DateTime firstDate;
   final String scheTitle;
-  final bool scheJudge;
-  final String scheStartDate;
   final String scheEndDate;
   final String scheContent;
 
   const PopChangeScreen({
     Key? key,
     required this.index,
-    required this.firstDate, 
     required this.scheTitle, 
-    required this.scheJudge, 
-    required this.scheStartDate, 
     required this.scheEndDate, 
     required this.scheContent
   }) : super(key: key);
@@ -47,8 +41,21 @@ class PopChangeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     bool switchJudge = ref.watch(switchChangeProvider);
     bool conditionJudge = ref.watch(conditionJudgeChangeProvider);
+    String scheStartDate = ref.watch(scheStartDateChangeShowProvider).toString();
 
     textSettingFunc(ref, scheTitle, scheContent);
+
+    CupertinoDatePickerMode mode = CupertinoDatePickerMode.dateAndTime;      
+    if(switchJudge == false) {
+      mode = CupertinoDatePickerMode.dateAndTime;      
+    }else {
+      mode = CupertinoDatePickerMode.date;      
+    }
+
+    DateTime dateTime = ref.watch(scheStartDateChangeShowProvider);
+    if(ref.watch(scheEndDateChangeShowProvider).isBefore(DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour+1, dateTime.minute))) {
+      ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour+1, dateTime.minute);
+    }  
 
     return MaterialApp(
       home: Scaffold(
@@ -78,11 +85,11 @@ class PopChangeScreen extends ConsumerWidget {
                             ),
                             child: const Text('編集を破棄'),
                           ),
-                          CupertinoActionSheetAction(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('キャンセル'),
-                          ),
                         ],
+                        cancelButton: CupertinoActionSheetAction(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('キャンセル'),
+                        ),
                       );
                     }
                   ),
@@ -211,6 +218,11 @@ class PopChangeScreen extends ConsumerWidget {
                                     child: FutureBuilder(
                                       future: getStartTimeScheFunc(ref),
                                       builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                        if (snapshot.hasData) {
+                                          Future.delayed(Duration.zero, () {
+                                            ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(snapshot.data);
+                                          });
+                                        }
                                         return Text(snapshot.data.toString());
                                       }
                                     ),    
@@ -243,10 +255,7 @@ class PopChangeScreen extends ConsumerWidget {
                                                     Navigator.pop(context, CupertinoPageRoute(
                                                       builder: (context) => PopChangeScreen(
                                                         index: index,
-                                                        firstDate:  firstDate, 
                                                         scheTitle: scheTitle, 
-                                                        scheJudge: scheJudge, 
-                                                        scheStartDate: scheStartDate, 
                                                         scheEndDate: scheEndDate, 
                                                         scheContent: scheContent
                                                       ),
@@ -268,10 +277,7 @@ class PopChangeScreen extends ConsumerWidget {
                                                       Navigator.pop(context, CupertinoPageRoute(
                                                         builder: (context) => PopChangeScreen(
                                                         index: index,
-                                                        firstDate: firstDate, 
                                                         scheTitle: scheTitle, 
-                                                        scheJudge: scheJudge, 
-                                                        scheStartDate: scheStartDate, 
                                                         scheEndDate: scheEndDate, 
                                                         scheContent: scheContent
                                                       ),
@@ -285,7 +291,7 @@ class PopChangeScreen extends ConsumerWidget {
                                             height: 200,
                                             child: CupertinoDatePicker(
                                               backgroundColor: Colors.white,
-                                              initialDateTime: DateTime.parse(scheStartDate),
+                                              initialDateTime: ref.watch(scheStartDateChangeShowProvider),
                                               minuteInterval: 15,
                                               onDateTimeChanged: (DateTime newTime) async{      
                                                 String month = newTime.month.toString();
@@ -307,6 +313,7 @@ class PopChangeScreen extends ConsumerWidget {
                                                 ref.read(scheStartDataChangeProvider.notifier).state = '${DateTime.parse(scheStartDate).year}-$month-$day $hour:$minute';
                                               },
                                               use24hFormat: true,
+                                              mode: mode,
                                             ),
                                           ),
                                         ],
@@ -333,6 +340,9 @@ class PopChangeScreen extends ConsumerWidget {
                                   child: FutureBuilder(
                                     future: getEndTimeScheFunc(ref),
                                     builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                      Future.delayed(Duration.zero, () {
+                                        ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime.parse(snapshot.data);
+                                      });
                                       return Text(snapshot.data.toString());
                                     },
                                   ),
@@ -365,10 +375,7 @@ class PopChangeScreen extends ConsumerWidget {
                                                   Navigator.pop(context, CupertinoPageRoute(
                                                     builder: (context) => PopChangeScreen(
                                                       index: index,
-                                                      firstDate:  firstDate, 
                                                       scheTitle: scheTitle, 
-                                                      scheJudge: scheJudge, 
-                                                      scheStartDate: scheStartDate, 
                                                       scheEndDate: scheEndDate, 
                                                       scheContent: scheContent
                                                     ),
@@ -392,10 +399,7 @@ class PopChangeScreen extends ConsumerWidget {
                                                     CupertinoPageRoute(
                                                       builder: (context) => PopChangeScreen(
                                                         index: index,
-                                                        firstDate: firstDate, 
                                                         scheTitle: scheTitle, 
-                                                        scheJudge: scheJudge, 
-                                                        scheStartDate: scheStartDate, 
                                                         scheEndDate: scheEndDate, 
                                                         scheContent: scheContent
                                                       ),
@@ -411,7 +415,14 @@ class PopChangeScreen extends ConsumerWidget {
                                           height: 200,
                                           child: CupertinoDatePicker(
                                             backgroundColor: Colors.white,
-                                            initialDateTime: DateTime.parse(scheEndDate),
+                                            initialDateTime: ref.watch(scheEndDateChangeShowProvider),
+                                            minimumDate: DateTime(
+                                              dateTime.year, 
+                                              dateTime.month, 
+                                              dateTime.day, 
+                                              dateTime.hour+1, 
+                                              dateTime.minute
+                                            ),
                                             minuteInterval: 15,
                                             onDateTimeChanged: (DateTime newTime) async{      
                                               String month = newTime.month.toString();
@@ -430,9 +441,10 @@ class PopChangeScreen extends ConsumerWidget {
                                               if (newTime.minute < 10) {
                                                 minute = '0$minute';
                                               }
-                                              ref.read(scheEndDataChangeProvider.notifier).state = '${DateTime.parse(scheEndDate).year}-$month-$day $hour:$minute';
+                                              ref.watch(scheEndDataChangeProvider.notifier).state = '${DateTime.parse(scheEndDate).year}-$month-$day $hour:$minute';
                                             },
                                             use24hFormat: true,
+                                            mode: mode,
                                           ),
                                         ),
                                       ],
@@ -481,19 +493,23 @@ class PopChangeScreen extends ConsumerWidget {
                             return CupertinoActionSheet(
                               actions: [
                                 CupertinoActionSheetAction(
-                                  onPressed: () => Navigator.push(
-                                    context, 
-                                    CupertinoPageRoute(
-                                      builder: (context) => const HomeScreen(),
-                                    )
-                                  ),
+                                  onPressed: () async{
+                                    Navigator.push(
+                                      context, 
+                                      CupertinoPageRoute(
+                                        builder: (context) => const HomeScreen(),
+                                      ),
+                                    );
+                                    await database.deleteSchedule(ref.watch(databaseGetDateProvider));
+                                    await database.close();
+                                  },
                                   child: const Text('編集を破棄'),
-                                ),
-                                CupertinoActionSheetAction(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('キャンセル'),
-                                ),
+                                ),  
                               ],
+                              cancelButton: CupertinoActionSheetAction(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('キャンセル'),
+                              ),
                             );
                           }
                         ),

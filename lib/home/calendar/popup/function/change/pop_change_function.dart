@@ -2,13 +2,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../provider/pop_change_provider.dart';
 import '../../provider/pop_provider.dart';
 
-Future<void> textSettingFunc(
-    WidgetRef ref, String scheTitle, String scheContent) async {
+void textSettingFunc(
+  WidgetRef ref, String scheTitle, String scheContent) {
+    final start = ref.watch(scheStartDateChangeShowProvider);
+    final end = ref.watch(scheEndDateChangeShowProvider);
   if (ref.watch(titleEditingProvider(scheTitle)).text.isNotEmpty &&
       ref.watch(commentEditingProvider(scheContent)).text.isNotEmpty) {
-    Future(() {
-      ref.watch(conditionJudgeChangeProvider.notifier).state = true;
-    });
+    if(start.isBefore(end)) {
+      Future(() {
+        ref.watch(conditionJudgeChangeProvider.notifier).state = true;
+      });
+    }else if (start.isAfter(end)){
+      Future(() {
+        ref.watch(conditionJudgeChangeProvider.notifier).state = false;
+      });
+    }else if(ref.watch(switchChangeProvider) == true) {
+      Future(() {
+        ref.watch(conditionJudgeChangeProvider.notifier).state = true;
+      });
+    }else {
+      Future(() {
+        ref.watch(conditionJudgeChangeProvider.notifier).state = false;
+      });
+    }
   } else {
     Future(() {
       ref.watch(conditionJudgeChangeProvider.notifier).state = false;

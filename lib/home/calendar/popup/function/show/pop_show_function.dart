@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../provider/pop_provider.dart';
 // import '../../../home/home_provider.dart';
 import '../../../../../database/database.dart';
+import 'package:holiday_jp/holiday_jp.dart' as holiday_jp;
 
 final queryexecutor = connectionDatabase();
 final database = ScheduleDatabase(queryexecutor);
@@ -19,8 +20,9 @@ scheJudgeFunc(WidgetRef ref, DateTime firstDateController) async{
 }
 
 //祝日の際のカラー設定
-void switchFunc(WidgetRef ref) {
+void switchFunc(WidgetRef ref, DateTime newFirstDay) {
   final judgeWeekPop = ref.watch(judgeWeekPopProvider);
+  ref.watch(holidayJudgeProvider.notifier).state = judgePageDateFunc(newFirstDay);
   if (ref.watch(holidayJudgeProvider) == false) {
     switch (judgeWeekPop){
       case 1:
@@ -92,3 +94,8 @@ void switchFunc(WidgetRef ref) {
     }
   }
 }
+
+bool judgePageDateFunc(DateTime day) {
+  return holiday_jp.isHoliday(day);
+}
+

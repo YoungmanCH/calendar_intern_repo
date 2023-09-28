@@ -123,13 +123,10 @@ class ScheduleDatabase extends _$ScheduleDatabase {
     await into(scheduleTable).insert(companion);
   }
 
-  Future<void> updateSchedule2(ScheduleRecord schedule) async {
-    await update(scheduleTable).replace(schedule);
-  }
-
   Future<void> updateSchedule(int id, String title, String startDay,
       String endDay, String content, DateTime date, bool judge) async {
     await (update(scheduleTable)..where((t) => t.id.equals(id))).write(
+      //多分、 .write の代わりに　.replaceを用いても良い。
       ScheduleTableCompanion(
         id: Value(id),
         title: Value(title),
@@ -141,6 +138,11 @@ class ScheduleDatabase extends _$ScheduleDatabase {
       ),
     );
   }
+
+  Future<void> deleteSchedule(DateTime scheduleDate) async {
+    await (delete(scheduleTable)..where((t) => t.date.equals(scheduleDate))).go();
+  }
+
 }
 
 LazyDatabase connectionDatabase() {

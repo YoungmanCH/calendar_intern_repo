@@ -11,6 +11,8 @@ import 'function/show/pop_show_function.dart';
 
 // command + . でcontainerなどで要素を囲える。
 
+//ポップアップをページビューリストで管理できるようにしよう！
+
 final queryexecutor = connectionDatabase();
 final database = ScheduleDatabase(queryexecutor);
 
@@ -43,7 +45,7 @@ popupController(BuildContext context, WidgetRef ref) async{
     scheduleEndDayList = ref.watch(scheduleEndDayListProvider.notifier).state;
   }
   
-
+    //Widget関数の代わりにclassで置き換える。
     Widget buildTime(bool judge, String start, String end) {
       if(judge == false) {
         DateTime startDateTime = DateTime.parse(start);
@@ -104,6 +106,7 @@ popupController(BuildContext context, WidgetRef ref) async{
                   scheduleTitleList.length,
                   (index) => SizedBox(
                     height: 80,
+                    width: 350,
                     child: CupertinoButton(
                       onPressed: () async{
                         final scheduleDataList =  await ref.read(scheduleListDateProvider(firstDateController).future);
@@ -113,14 +116,13 @@ popupController(BuildContext context, WidgetRef ref) async{
                             context,
                             CupertinoPageRoute(builder: (context) => PopChangeScreen(
                               index: banana.id,
-                              firstDate: firstDateController,
                               scheTitle: banana.title,
-                              scheJudge: banana.judge,
-                              scheStartDate: banana.startDay,
                               scheEndDate: banana.endDay,
                               scheContent: banana.content,
                             )),
                           );
+                          ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(banana.startDay);
+                          ref.watch(databaseGetDateProvider.notifier).state = banana.date;
                           final fruits = DateTime.parse(banana.startDay);
                           final fruits2 = DateTime.parse(banana.endDay);
                           ref.watch(popSelectedStartShowProvider.notifier).state = DateTime(
@@ -160,7 +162,13 @@ popupController(BuildContext context, WidgetRef ref) async{
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
-                            child: Text(scheduleTitleList[index]),
+                            child: SizedBox(
+                              width: 200,
+                              child: Text(
+                                scheduleTitleList[index],
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -213,9 +221,7 @@ popupController(BuildContext context, WidgetRef ref) async{
                         scheJudgeFunc(ref, newFirstDay);
                         ref.watch(judgeWeekPopProvider.notifier).state = newFirstDay.weekday;
 
-
-
-
+                      
 
 
 
@@ -234,27 +240,7 @@ popupController(BuildContext context, WidgetRef ref) async{
 
 
 
-                        // ref.watch(holidaysProvider(newFirstDay)).when(
-                        //   loading: () => (),
-                        //   error: (error, stackTrace) => debugPrint('error: $error, $stackTrace'),
-                        //   data: (holidayList) {
-                        //     final date = DateTime(newFirstDay.year, newFirstDay.month, newFirstDay.day);
-                        //     String dateMonth = date.month.toString();
-                        //     String dateDay = date.day.toString();
-                        //     if(date.month < 10) {
-                        //       dateMonth = '0${date.month}';
-                        //     }
-                        //     if(date.day < 10) {
-                        //       dateDay = '0${date.day}';
-                        //     }
-                        //     final dateJudge = '${date.year}-$dateMonth-$dateDay';
-                        //     if(holidayList.contains(dateJudge)) {
-                        //       judgeHoliday = true;
-                        //       // ref.watch(holidayJudgeProvider.notifier).state = true;
-                        //     }
-                        //   }
-                        // );
-                        // ref.watch(holidayJudgeProvider.notifier).state = judgeHoliday;
+                    
 
 
 
@@ -273,7 +259,7 @@ popupController(BuildContext context, WidgetRef ref) async{
                         } else {
                           newDatePop = '${newFirstDay.day}';
                         }
-                        switchFunc(ref);
+                        switchFunc(ref, newFirstDay);
 
                         return FutureBuilder(
                           future: scheJudgeFunc(ref, newFirstDay),

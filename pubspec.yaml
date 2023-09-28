@@ -43,6 +43,7 @@ dependencies:
   provider: ^5.0.0
   sqlite3_flutter_libs: ^0.5.5
   path: ^1.8.0
+  flutter_localization: ^0.1.14
 
 dev_dependencies:
   flutter_test:
