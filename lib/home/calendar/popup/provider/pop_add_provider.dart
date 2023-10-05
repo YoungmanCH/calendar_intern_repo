@@ -45,12 +45,12 @@ final popSelectedStartDateProvider = FutureProvider.family<String, String>(
     String datetimeData = '${datetimeStart.year}-$month-$day $hour:$minute';
 
     ref.watch(dateTimeJudgeProvider.notifier).updateDateTime(
-      yearInit, 
-      monthInit,
-      dayInit,
-      hourInit,
-      minuteInit,
-    );
+          yearInit,
+          monthInit,
+          dayInit,
+          hourInit,
+          minuteInit,
+        );
 
     if (ref.watch(switchProvider) == true) {
       datetimeData = '${datetimeStart.year}-$month-$day';
@@ -89,12 +89,12 @@ final popSelectedEndDateProvider = FutureProvider.family<String, String>(
     }
     String datetimeData = '${datetimeEnd.year}-$month-$day $hour:$minute';
     ref.watch(dateTimeJudgeProvider.notifier).updateDateTime2(
-      yearInit, 
-      monthInit,
-      dayInit,
-      hourInit,
-      minuteInit,
-    );
+          yearInit,
+          monthInit,
+          dayInit,
+          hourInit,
+          minuteInit,
+        );
     if (ref.watch(switchProvider) == true) {
       datetimeData = '${datetimeEnd.year}-$month-$day';
     }
@@ -103,14 +103,16 @@ final popSelectedEndDateProvider = FutureProvider.family<String, String>(
 );
 
 final scheStartDataProvider = StateProvider<String>((ref) => '');
-final scheStartDateShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
-final scheEndDateShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final scheStartDateShowProvider =
+    StateProvider<DateTime>((ref) => DateTime.now());
+final scheEndDateShowProvider =
+    StateProvider<DateTime>((ref) => DateTime.now());
 final scheEndDataProvider = StateProvider<String>((ref) => '');
 
+final dateTimeJudgeProvider = NotifierProvider<DateTimeJudgeNotifier, DateTime>(
+    DateTimeJudgeNotifier.new);
 
-final dateTimeJudgeProvider = NotifierProvider<DateTimeJudgeNotifier, DateTime>(DateTimeJudgeNotifier.new);
-
-class DateTimeJudgeNotifier extends Notifier<DateTime>{
+class DateTimeJudgeNotifier extends Notifier<DateTime> {
   //build() コードが初期化コードである。
   @override
   DateTime build() {
@@ -121,6 +123,7 @@ class DateTimeJudgeNotifier extends Notifier<DateTime>{
     // state = DateTime(year, month, day, hour, minute);
     return DateTime(year, month, day, hour, minute);
   }
+
   updateDateTime2(int year, int month, int day, int hour, int minute) {
     // state = DateTime(year, month, day, hour, minute);
     return DateTime(year, month, day, hour, minute);

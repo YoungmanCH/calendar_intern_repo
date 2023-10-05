@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'calendar_provider.dart';
-import 'popup/provider/pop_provider.dart';
-import 'popup/popup_show.dart';
+import 'popup/provider/pop_show_provider.dart';
+import 'popup/popup_show_page.dart';
 
 class CalendarScreen extends ConsumerWidget {
   final DateTime firstDay;
@@ -208,7 +208,6 @@ class CalendarScreen extends ConsumerWidget {
                   crossAxisCount: 7,      
                 ),
                 itemBuilder: (context, index) {
-                  //祝日の場合は全く計算していない。
                   Color textColor = Colors.black;
                   Color backgroundColor = Colors.white;
                   final List saturday = [5, 12, 19, 26, 33, 40];
@@ -360,6 +359,7 @@ class CalendarScreen extends ConsumerWidget {
                           ),
                         ),
                       );
+                      //後で、きれいにしましょう！！！！
                     }else if (index < dateInMonth.length + lateCount) {
                       // その月の日付を表示
                       plusCount = index - lateCount;
