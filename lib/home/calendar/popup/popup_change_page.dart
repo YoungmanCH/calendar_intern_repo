@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../home_page.dart';
 import '../../../database/database.dart';
-import 'function/change/pop_change_function.dart';
 import 'provider/pop_change_provider.dart';
+import 'function/change/pop_change_function.dart';
+import 'function/change/pop_change_widget.dart';
 
 // option + shift+ f 
 
@@ -16,12 +17,9 @@ import 'provider/pop_change_provider.dart';
 
 //青文字、黄色文字の波線は極力減らすべし。
 
-// .familyを使用することで、クラス外からクラス内の変数を引数として使用できるようになる。また、<>型を複数設定できるようになり、第一引数型はその変数の型を指す。
-
 //futureProviderでデータの値を取得する場合は　await ref.read(popSelectedDateProvider(scheStartDate).future),　のように使用する。buildするときは、whenを使用する。
 
-final queryexecutor = connectionDatabase();
-final database = ScheduleDatabase(queryexecutor);
+// command + . でcontainerなどで要素を囲える。
 
 class PopChangeScreen extends ConsumerWidget {
   final int index;
@@ -39,23 +37,17 @@ class PopChangeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    bool switchJudge = ref.watch(switchChangeProvider);
-    bool conditionJudge = ref.watch(conditionJudgeChangeProvider);
-    String scheStartDate = ref.watch(scheStartDateChangeShowProvider).toString();
-
-    textSettingFunc(ref, scheTitle, scheContent);
+    String scheStartDate = ref.read(scheStartDataChangeProvider).toString();
+    Future(() {
+      textSettingFunc(ref, scheTitle, scheContent);
+    });
 
     CupertinoDatePickerMode mode = CupertinoDatePickerMode.dateAndTime;      
-    if(switchJudge == false) {
+    if(ref.watch(switchChangeProvider) == false) {
       mode = CupertinoDatePickerMode.dateAndTime;      
     }else {
       mode = CupertinoDatePickerMode.date;      
     }
-
-    DateTime dateTime = ref.watch(scheStartDateChangeShowProvider);
-    if(ref.watch(scheEndDateChangeShowProvider).isBefore(DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour+1, dateTime.minute))) {
-      ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour+1, dateTime.minute);
-    }  
 
     return MaterialApp(
       home: Scaffold(
@@ -70,30 +62,7 @@ class PopChangeScreen extends ConsumerWidget {
                   CupertinoIcons.clear,
                   color: Colors.white,
                 ),
-                onPressed: () => {
-                  showCupertinoModalPopup(                      
-                    context: context,
-                    builder: (BuildContext context) {
-                      return CupertinoActionSheet(
-                        actions: [
-                          CupertinoActionSheetAction(
-                            onPressed: () => Navigator.push(
-                              context, 
-                              CupertinoPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              )
-                            ),
-                            child: const Text('編集を破棄'),
-                          ),
-                        ],
-                        cancelButton: CupertinoActionSheetAction(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('キャンセル'),
-                        ),
-                      );
-                    }
-                  ),
-                }
+                onPressed: () => appBarCancelChangeFunc(context, ref),
               ),
               const Text(
                 '予定の編集', 
@@ -106,7 +75,7 @@ class PopChangeScreen extends ConsumerWidget {
                 child: CupertinoButton(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
                   color: Colors.white,
-                  onPressed: conditionJudge == false ? null : () async{
+                  onPressed: ref.watch(conditionJudgeChangeProvider) == false ? null : () async{
                     Navigator.push(
                       context, 
                       CupertinoPageRoute(builder: (context) => const HomeScreen())
@@ -184,10 +153,9 @@ class PopChangeScreen extends ConsumerWidget {
                                   ),    
                                 ),
                                 Switch(
-                                  value: switchJudge,
+                                  value: ref.watch(switchChangeProvider),
                                   onChanged: (value) {
-                                    switchJudge = value;
-                                    ref.watch(switchChangeProvider.notifier).state = switchJudge;
+                                    ref.watch(switchChangeProvider.notifier).state = value;
                                   },
                                 ),
                               ],
@@ -230,98 +198,16 @@ class PopChangeScreen extends ConsumerWidget {
                                 ],
                               ),
                               onPressed: () {
-                                showCupertinoModalPopup(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      height: 300,
-                                      color: Colors.white,
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(left: 10),
-                                                child:  CupertinoButton(
-                                                  child: const Text(
-                                                    'キャンセル',
-                                                    style: TextStyle(
-                                                      color: Colors.blue,
-                                                      fontSize: 16,
-                                                    ),                                                
-                                                  ),
-                                                  onPressed: () async {
-                                                    Navigator.pop(context, CupertinoPageRoute(
-                                                      builder: (context) => PopChangeScreen(
-                                                        index: index,
-                                                        scheTitle: scheTitle, 
-                                                        scheEndDate: scheEndDate, 
-                                                        scheContent: scheContent
-                                                      ),
-                                                    ),);
-                                                  },
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(right: 10),
-                                                  child: CupertinoButton(
-                                                    child: const Text(
-                                                      '完了',
-                                                      style: TextStyle(
-                                                        color: Colors.blue,
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                    onPressed: () async{ 
-                                                      Navigator.pop(context, CupertinoPageRoute(
-                                                        builder: (context) => PopChangeScreen(
-                                                        index: index,
-                                                        scheTitle: scheTitle, 
-                                                        scheEndDate: scheEndDate, 
-                                                        scheContent: scheContent
-                                                      ),
-                                                    ));
-                                                  }
-                                                ),
-                                              ),                       
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 200,
-                                            child: CupertinoDatePicker(
-                                              backgroundColor: Colors.white,
-                                              initialDateTime: ref.watch(scheStartDateChangeShowProvider),
-                                              minuteInterval: 15,
-                                              onDateTimeChanged: (DateTime newTime) async{      
-                                                String month = newTime.month.toString();
-                                                String day = newTime.day.toString();
-                                                String hour = newTime.hour.toString();
-                                                String minute = newTime.minute.toString();
-                                                if (newTime.month < 10) {
-                                                  month = '0$month';
-                                                }
-                                                if (newTime.day < 10) {
-                                                  day = '0$day';
-                                                }
-                                                if (newTime.hour < 10) {
-                                                  hour = '0$hour';
-                                                }
-                                                if (newTime.minute < 10) {
-                                                  minute = '0$minute';
-                                                }
-                                                ref.read(scheStartDataChangeProvider.notifier).state = '${DateTime.parse(scheStartDate).year}-$month-$day $hour:$minute';
-                                              },
-                                              use24hFormat: true,
-                                              mode: mode,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
+                                startDatePickerChangeFunc(
+                                  context,
+                                  ref,
+                                  index,
+                                  scheTitle,
+                                  scheEndDate,
+                                  scheContent,
+                                  mode
                                 );
-                              },
+                              }
                             ),
                           ),
                         ),
@@ -350,107 +236,14 @@ class PopChangeScreen extends ConsumerWidget {
                               ],
                             ),
                             onPressed: () async{
-                              showCupertinoModalPopup(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    height: 300,
-                                    color: Colors.white,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 10),
-                                              child:  CupertinoButton(
-                                                child: const Text(
-                                                  'キャンセル',
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                onPressed: () async {
-                                                  Navigator.pop(context, CupertinoPageRoute(
-                                                    builder: (context) => PopChangeScreen(
-                                                      index: index,
-                                                      scheTitle: scheTitle, 
-                                                      scheEndDate: scheEndDate, 
-                                                      scheContent: scheContent
-                                                    ),
-                                                  ));
-                                                },
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(right: 10),
-                                              child: CupertinoButton(
-                                                child: const Text(
-                                                  '完了',
-                                                  style: TextStyle(
-                                                    color: Colors.blue,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                onPressed: () async{ 
-                                                  Navigator.pop(
-                                                    context, 
-                                                    CupertinoPageRoute(
-                                                      builder: (context) => PopChangeScreen(
-                                                        index: index,
-                                                        scheTitle: scheTitle, 
-                                                        scheEndDate: scheEndDate, 
-                                                        scheContent: scheContent
-                                                      ),
-                                                    ),
-                                                  );
-                                                  await ref.read(popSelectedChangeEndDateProvider(scheEndDate).future);
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 200,
-                                          child: CupertinoDatePicker(
-                                            backgroundColor: Colors.white,
-                                            initialDateTime: ref.watch(scheEndDateChangeShowProvider),
-                                            minimumDate: DateTime(
-                                              dateTime.year, 
-                                              dateTime.month, 
-                                              dateTime.day, 
-                                              dateTime.hour+1, 
-                                              dateTime.minute
-                                            ),
-                                            minuteInterval: 15,
-                                            onDateTimeChanged: (DateTime newTime) async{      
-                                              String month = newTime.month.toString();
-                                              String day = newTime.day.toString();
-                                              String hour = newTime.hour.toString();
-                                              String minute = newTime.minute.toString();
-                                              if (newTime.month < 10) {
-                                                month = '0$month';
-                                              }
-                                              if (newTime.day < 10) {
-                                                day = '0$day';
-                                              }
-                                              if (newTime.hour < 10) {
-                                                hour = '0$hour';
-                                              }
-                                              if (newTime.minute < 10) {
-                                                minute = '0$minute';
-                                              }
-                                              ref.watch(scheEndDataChangeProvider.notifier).state = '${DateTime.parse(scheEndDate).year}-$month-$day $hour:$minute';
-                                            },
-                                            use24hFormat: true,
-                                            mode: mode,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                              endDatePickerChangeFunc(
+                                context,
+                                ref,
+                                index,
+                                scheTitle,
+                                scheEndDate,
+                                scheContent,
+                                mode,
                               );
                             },
                           ),
@@ -486,34 +279,7 @@ class PopChangeScreen extends ConsumerWidget {
                           color: CupertinoColors.systemRed,
                         ),
                       ),
-                      onPressed: () => {
-                        showCupertinoModalPopup(                      
-                          context: context,
-                          builder: (BuildContext context) {
-                            return CupertinoActionSheet(
-                              actions: [
-                                CupertinoActionSheetAction(
-                                  onPressed: () async{
-                                    Navigator.push(
-                                      context, 
-                                      CupertinoPageRoute(
-                                        builder: (context) => const HomeScreen(),
-                                      ),
-                                    );
-                                    await database.deleteSchedule(ref.watch(databaseGetDateProvider));
-                                    await database.close();
-                                  },
-                                  child: const Text('編集を破棄'),
-                                ),  
-                              ],
-                              cancelButton: CupertinoActionSheetAction(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('キャンセル'),
-                              ),
-                            );
-                          }
-                        ),
-                      }
+                      onPressed: () => deleteScheduleFunc(context, ref),
                     ),
                   ),
                 ),

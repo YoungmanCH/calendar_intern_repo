@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart';
 import 'start_page.dart';
 void main() {
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   const mainApp = MyApp();
   const scope = ProviderScope(child: mainApp);
   runApp(scope);
