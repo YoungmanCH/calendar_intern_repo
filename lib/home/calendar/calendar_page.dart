@@ -276,9 +276,9 @@ class CalendarScreen extends ConsumerWidget {
                                   child: Text(
                                     dateInMonth[index % dateInMonth.length].toString(),
                                     style: TextStyle(
-                                        fontSize: 14,
-                                        color: textColor,
-                                      ),
+                                      fontSize: 14,
+                                      color: textColor,
+                                    ),
                                   ),
                                   onPressed: () {
                                     dateSave = dateInMonth[index % dateInMonth.length];
@@ -359,7 +359,6 @@ class CalendarScreen extends ConsumerWidget {
                           ),
                         ),
                       );
-                      //後で、きれいにしましょう！！！！
                     }else if (index < dateInMonth.length + lateCount) {
                       // その月の日付を表示
                       plusCount = index - lateCount;

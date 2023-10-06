@@ -13,10 +13,8 @@ final selectedWeekdayProvider =
 final selectedWeekdayStringProvider = StateProvider<String>((ref) => '');
 final selectedWeekColorProvider = StateProvider<Color>((ref) => Colors.black);
 
-final currentPage2Provider =
-    StateProvider<int>((ref) => DateTime.now().month - 1);
 final pageControllerProvider2 = Provider<PageController>((ref) {
-  final currentPage = ref.watch(currentPage2Provider);
+  final currentPage = DateTime.now().month - 1;
   return PageController(initialPage: currentPage);
 });
 
