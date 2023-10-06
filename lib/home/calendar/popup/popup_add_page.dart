@@ -6,12 +6,8 @@ import '../../../database/database.dart';
 import 'provider/pop_add_provider.dart';
 import 'function/add/pop_add_function.dart';
 import 'function/add/pop_add_widget.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 //現在の問題は、ロールリストが日本語表記になっていない点である。
-
-//Providerの変更をウィジェットのライフサイクル外で行うように変更しよう！
-// textSettingFunc(ref, '', ''); の中身を見ると、この関数は非同期で実行されている
 
 class PopAddScreen extends ConsumerWidget {
   final DateTime popSelected;
@@ -34,15 +30,6 @@ class PopAddScreen extends ConsumerWidget {
     }
 
     return MaterialApp(
-      localizationsDelegates: const [
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ja'),
-      ],
-      locale: const Locale('ja'),
       home: Scaffold(
         appBar: CupertinoNavigationBar(
           backgroundColor: Colors.blue,
