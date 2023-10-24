@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+
 part 'database.g.dart';
 
 final databaseProvider =
@@ -37,8 +38,14 @@ class ScheduleDatabase extends _$ScheduleDatabase {
   @override
   int get schemaVersion => 1;
 
-  Future<List> getSchedule() {
+  Future<List> getScheduleList() {
     return select(scheduleTable).get();
+  }
+
+  Future<ScheduleRecord> getSchedule(int id) async {
+    final result =
+        await (select(scheduleTable)..where((t) => t.id.equals(id))).getSingle();
+    return result;
   }
 
   Future<List<ScheduleRecord>> getScheduleListDate(
@@ -138,9 +145,9 @@ class ScheduleDatabase extends _$ScheduleDatabase {
   }
 
   Future<void> deleteSchedule(DateTime scheduleDate) async {
-    await (delete(scheduleTable)..where((t) => t.date.equals(scheduleDate))).go();
+    await (delete(scheduleTable)..where((t) => t.date.equals(scheduleDate)))
+        .go();
   }
-
 }
 
 LazyDatabase connectionDatabase() {

@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: [
         Locale('ja'),
       ],
-      locale: const Locale('ja'),
+      locale: Locale('ja'),
       home: StartWidget(),
     );
   }

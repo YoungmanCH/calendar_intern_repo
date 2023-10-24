@@ -21,26 +21,41 @@ import 'function/change/pop_change_widget.dart';
 
 // command + . でcontainerなどで要素を囲える。
 
-class PopChangeScreen extends ConsumerWidget {
-  final int index;
-  final String scheTitle;
-  final String scheEndDate;
-  final String scheContent;
+//ref.watch, ref.listenは関数内で使用してはいけない。
 
-  const PopChangeScreen({
-    Key? key,
-    required this.index,
-    required this.scheTitle, 
-    required this.scheEndDate, 
-    required this.scheContent
-  }) : super(key: key);
+
+//dataの取得は、futureProviderで行い、pageviewでのデータの変更はstateproviderで扱う。
+
+class PopChangeWidget extends ConsumerStatefulWidget {
+  const PopChangeWidget({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  PopChangeScreen createState() => PopChangeScreen();
+}
+
+class PopChangeScreen extends ConsumerState<PopChangeWidget> {
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final changePro = ref.watch(popupChangeValProvider);
+    final index = changePro.id;
+    final scheTitle = changePro.scheTitle;
+    final scheEndDate = changePro.scheEndDate;
+    final scheContent = changePro.scheContent;
     String scheStartDate = ref.read(scheStartDataChangeProvider).toString();
-    Future(() {
-      textSettingFunc(ref, scheTitle, scheContent);
-    });
+
+    //build後に実行される。どうしてもbuild内でProviderの状態を変更したい場合に用いる。
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) =>  textSettingFunc(ref, scheTitle, scheContent),
+    );
+  
 
     CupertinoDatePickerMode mode = CupertinoDatePickerMode.dateAndTime;      
     if(ref.watch(switchChangeProvider) == false) {
@@ -51,6 +66,9 @@ class PopChangeScreen extends ConsumerWidget {
 
     return MaterialApp(
       home: Scaffold(
+        //キーボードが表示されると画面のサイズを変更する
+        resizeToAvoidBottomInset: true,
+        backgroundColor: const Color.fromARGB(248, 235, 234, 234),
         appBar: CupertinoNavigationBar(
           backgroundColor: Colors.blue,
           leading: Row(
@@ -74,7 +92,7 @@ class PopChangeScreen extends ConsumerWidget {
                 padding: const EdgeInsets.only(right: 10, bottom: 5),
                 child: CupertinoButton(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-                  color: Colors.white,
+                  color: Colors.white, 
                   onPressed: ref.watch(conditionJudgeChangeProvider) == false ? null : () async{
                     Navigator.push(
                       context, 
@@ -105,186 +123,193 @@ class PopChangeScreen extends ConsumerWidget {
             ],
           ),
         ),
-        body: Center(
-          child: Container(
-            color: const Color.fromARGB(248, 235, 234, 234),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: SizedBox(
-                    width: 400,
-                    height: 60,
-                    child: CupertinoTextField(
-                      // placeholder: 'タイトルを入力してください',
-                      controller: ref.watch(titleEditingProvider(scheTitle)),
-                    ),  
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40, right: 15, left: 15),
-                  child: Container(
-                    width: 600,
-                    height: 180,
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Color.fromARGB(248, 235, 234, 234),
-                                width: 1.0,
+        body: SingleChildScrollView(
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: Center(
+              child: Container(
+                color: const Color.fromARGB(248, 235, 234, 234),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: SizedBox(
+                        width: 400,
+                        height: 60,
+                        child: CupertinoTextField(
+                          // placeholder: 'タイトルを入力してください',
+                          autofocus: true,
+                          // focusNode: focusNode,
+                          controller: ref.watch(titleEditingProvider(scheTitle)),
+                        ),  
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 40, right: 10, left: 10),
+                      child: Container(
+                        width: 600,
+                        height: 180,
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Color.fromARGB(248, 235, 234, 234),
+                                    width: 1.0,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          child: SizedBox(
-                            height: 55,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 15,),
-                                  child: Text(
-                                    '終日',
-                                    style: TextStyle(
-                                      fontSize: 17,
+                              child: SizedBox(
+                                height: 55,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 15,),
+                                      child: Text(
+                                        '終日',
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                        ),
+                                      ),    
                                     ),
-                                  ),    
-                                ),
-                                Switch(
-                                  value: ref.watch(switchChangeProvider),
-                                  onChanged: (value) {
-                                    ref.watch(switchChangeProvider.notifier).state = value;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 60,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: Color.fromARGB(248, 235, 234, 234),
-                                  width: 1.0,
+                                    Switch(
+                                      value: ref.watch(switchChangeProvider),
+                                      onChanged: (value) {
+                                        ref.watch(switchChangeProvider.notifier).state = value;
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            child: CupertinoButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    '開始',
-                                    style: TextStyle(color: Colors.black),
+                            SizedBox(
+                              height: 60,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Color.fromARGB(248, 235, 234, 234),
+                                      width: 1.0,
+                                    ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 15,),
-                                    child: FutureBuilder(
-                                      future: getStartTimeScheFunc(ref),
-                                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                        if (snapshot.hasData) {
-                                          Future.delayed(Duration.zero, () {
-                                            ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(snapshot.data);
-                                          });
-                                        }
-                                        return Text(snapshot.data.toString());
-                                      }
-                                    ),    
+                                ),
+                                child: CupertinoButton(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        '開始',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 15,),
+                                        child: FutureBuilder(
+                                          future: getStartTimeScheFunc(ref),
+                                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                            if (snapshot.hasData) {
+                                              Future.delayed(Duration.zero, () {
+                                                ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(snapshot.data);
+                                              });
+                                            }
+                                            print('timeStart: ${snapshot.data}');
+                                            return Text(snapshot.data.toString());
+                                          }
+                                        ),    
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                  onPressed: () {
+                                    startDatePickerChangeFunc(
+                                      context,
+                                      ref,
+                                      index,
+                                      scheTitle,
+                                      scheEndDate,
+                                      scheContent,
+                                      mode
+                                    );
+                                  }
+                                ),
                               ),
-                              onPressed: () {
-                                startDatePickerChangeFunc(
-                                  context,
-                                  ref,
-                                  index,
-                                  scheTitle,
-                                  scheEndDate,
-                                  scheContent,
-                                  mode
-                                );
-                              }
                             ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 60,
-                          child: CupertinoButton(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  '終了',
-                                  style: TextStyle(color: Colors.black),
+                            SizedBox(
+                              height: 60,
+                              child: CupertinoButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      '終了',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 15,),
+                                      child: FutureBuilder(
+                                        future: getEndTimeScheFunc(ref),
+                                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                          return Text(snapshot.data.toString());
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 15,),
-                                  child: FutureBuilder(
-                                    future: getEndTimeScheFunc(ref),
-                                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                      Future.delayed(Duration.zero, () {
-                                        ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime.parse(snapshot.data);
-                                      });
-                                      return Text(snapshot.data.toString());
-                                    },
-                                  ),
-                                ),
-                              ],
+                                onPressed: () async{
+                                  endDatePickerChangeFunc(
+                                    context,
+                                    ref,
+                                    index,
+                                    scheTitle,
+                                    scheEndDate,
+                                    scheContent,
+                                    mode,
+                                  );
+                                },
+                              ),
                             ),
-                            onPressed: () async{
-                              endDatePickerChangeFunc(
-                                context,
-                                ref,
-                                index,
-                                scheTitle,
-                                scheEndDate,
-                                scheContent,
-                                mode,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Container(
-                    color: Colors.white,
-                    width: 400,
-                    height: 160,
-                    child: CupertinoTextField(
-                      // placeholder: 'コメントを入力してください',
-                      controller: ref.watch(commentEditingProvider(scheContent)),
-                      maxLines: 6,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 35),
-                  child: Container(
-                    color: Colors.white,
-                    width: 400,
-                    height: 60,
-                    child: CupertinoButton(
-                      padding: const EdgeInsets.only(bottom: 0),
-                      child: const Text(
-                        'この予定を削除',
-                        style: TextStyle(
-                          color: CupertinoColors.systemRed,
+                          ],
                         ),
                       ),
-                      onPressed: () => deleteScheduleFunc(context, ref),
                     ),
-                  ),
-                ),
-              ],
-            ),     
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        color: Colors.white,
+                        width: 400,
+                        height: 160,
+                        child: CupertinoTextField(
+                          // placeholder: 'コメントを入力してください',
+                          controller: ref.watch(commentEditingProvider(scheContent)),
+                          maxLines: 6,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 35),
+                      child: Container(
+                        color: Colors.white,
+                        width: 400,
+                        height: 60,
+                        child: CupertinoButton(
+                          padding: const EdgeInsets.only(bottom: 0),
+                          child: const Text(
+                            'この予定を削除',
+                            style: TextStyle(
+                              color: CupertinoColors.systemRed,
+                            ),
+                          ),
+                          onPressed: () => deleteScheduleFunc(context, ref),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),     
+              ),
+            ),
           ),
         ),
       ),

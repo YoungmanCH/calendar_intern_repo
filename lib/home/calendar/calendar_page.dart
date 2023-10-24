@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'calendar_widget.dart';
 import 'calendar_provider.dart';
 import 'popup/provider/pop_show_provider.dart';
 import 'popup/popup_show_page.dart';
@@ -19,6 +20,11 @@ class CalendarScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    //notifierは通知されるため、ウィジェットの描画が必要なとこに用いるか、NotiferでcopyWith()を作成して呼び出す必要がある。
+
+    //タプル型の構造体の変数を呼び出す場合は、下記のように使用する。なお、構造体とはいえ、定数です。
+    // ref.watch(calendarProvider((firstDay: firstDay))).lateCount;
     List dateList = [];
     final List dayOfWeek = ['月', '火', '水', '木', '金', '土', '日'];
     final List monthNumber = List.generate(12, (index) => index+1);
@@ -34,6 +40,8 @@ class CalendarScreen extends ConsumerWidget {
     bool judge = false;
     int dateSave = 0;
     int plusSaveCount = 0;
+
+    List<bool> calJudgeList = [];
 
     void dateInMonthFunc() {
       year = firstDay.year;
@@ -61,6 +69,7 @@ class CalendarScreen extends ConsumerWidget {
       }
     }
 
+    //ここのコードをカレンダー形式に変更させる。
     Future <void> dateTimePickerFunc(BuildContext context, WidgetRef ref) async {
       final DateTime dateTime = DateTime.now();
       final dateTimeYear = dateTime.year;
@@ -104,6 +113,7 @@ class CalendarScreen extends ConsumerWidget {
 
     dateInMonthFunc();
     dateListFunc();
+    calJudgeList.clear();
 
     return CupertinoPageScaffold(
       child: Center(
@@ -227,6 +237,7 @@ class CalendarScreen extends ConsumerWidget {
                     judge = false;
                   }
 
+
                   if (firstDay.weekday == DateTime.monday) {
                     if (index < dateInMonth.length) {
                       if (index + 1 == DateTime.now().day && judge == true) {
@@ -257,6 +268,12 @@ class CalendarScreen extends ConsumerWidget {
                         }
                       );
 
+                      int year = firstDay.year;
+                      int month = firstDay.month;
+                      int day = index + 1;
+
+                      DateTime dateCalen = DateTime(year, month, day);
+
                       return Container(
                         color: Colors.white,
                         child: Align(
@@ -265,40 +282,47 @@ class CalendarScreen extends ConsumerWidget {
                             width: 50,
                             height: 50,
                             child: Center(
-                              child: Container(
-                                width: 35,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  color: backgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: TextButton(
-                                  child: Text(
-                                    dateInMonth[index % dateInMonth.length].toString(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textColor,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 35,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: TextButton(
+                                      child: Text(
+                                        dateInMonth[index % dateInMonth.length].toString(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        dateSave = dateInMonth[index % dateInMonth.length];
+                                        dateSave = dateSave;
+                                        int year = firstDay.year;
+                                        int month = firstDay.month;
+                                        int day = dateSave;
+                                        ref.watch(setYearProvider.notifier).state = year;
+                                        ref.watch(setMonthProvider.notifier).state = month;
+                                        ref.watch(setDayProvider.notifier).state = day;
+                                        ref.watch(judgeWeekPopProvider.notifier).state = DateTime(year, month, day).weekday;
+
+                                        if (textColor == Colors.red) {
+                                          ref.watch(holidayJudgeProvider.notifier).state = true;
+                                        }else {
+                                          ref.watch(holidayJudgeProvider.notifier).state = false;
+                                        }
+                                        popupController(context,ref);
+                                      },
                                     ),
                                   ),
-                                  onPressed: () {
-                                    dateSave = dateInMonth[index % dateInMonth.length];
-                                    dateSave = dateSave;
-                                    int year = firstDay.year;
-                                    int month = firstDay.month;
-                                    int day = dateSave;
-                                    ref.watch(setYearProvider.notifier).state = year;
-                                    ref.watch(setMonthProvider.notifier).state = month;
-                                    ref.watch(setDayProvider.notifier).state = day;
-                                    ref.watch(judgeWeekPopProvider.notifier).state = DateTime(year, month, day).weekday;
-
-                                    if (textColor == Colors.red) {
-                                      ref.watch(holidayJudgeProvider.notifier).state = true;
-                                    }else {
-                                      ref.watch(holidayJudgeProvider.notifier).state = false;
-                                    }
-                                    popupController(context,ref);
-                                  },
-                                ),
+                                  Container(
+                                    child: CalendarFunc(ref, dateCalen),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -364,6 +388,14 @@ class CalendarScreen extends ConsumerWidget {
                       plusCount = index - lateCount;
                       int plusPressedCount = plusCount;
 
+
+                      int year = firstDay.year;
+                      int month = firstDay.month;
+                      int day = plusPressedCount + 1;
+
+                      DateTime dateCalen = DateTime(year, month, day);
+                    
+
                       ref.watch(holidaysProvider(firstDay)).when(
                         loading: () => (),
                         error: (error, stackTrace) => debugPrint('error: $error, $stackTrace'),
@@ -400,41 +432,48 @@ class CalendarScreen extends ConsumerWidget {
                             width: 50,
                             height: 50,                              
                             child: Center(
-                              child: Container(
-                                width: 35,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  color: backgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: TextButton(
-                                  child: Text(
-                                    dateInMonth[plusCount % dateInMonth.length].toString(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textColor,
-                                    ), 
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 35,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: TextButton(
+                                      child: Text(
+                                        dateInMonth[plusCount % dateInMonth.length].toString(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: textColor,
+                                        ), 
+                                      ),
+                                      onPressed: ()  {
+                                        dateSave = dateInMonth[plusPressedCount % dateInMonth.length];
+                                        plusSaveCount = plusPressedCount;
+
+                                        int year = firstDay.year;
+                                        int month = firstDay.month;
+                                        int day = plusSaveCount + 1;
+                                        ref.watch(setYearProvider.notifier).state = year;
+                                        ref.watch(setMonthProvider.notifier).state = month;
+                                        ref.watch(setDayProvider.notifier).state = day;
+                                        ref.watch(judgeWeekPopProvider.notifier).state = DateTime(year, month, day).weekday;
+
+                                        if (textColor == Colors.red) {
+                                          ref.watch(holidayJudgeProvider.notifier).state = true;
+                                        }else {
+                                          ref.watch(holidayJudgeProvider.notifier).state = false;
+                                        }
+                                        popupController(context,ref);
+                                      },
+                                    ),                        
                                   ),
-                                  onPressed: ()  {
-                                    dateSave = dateInMonth[plusPressedCount % dateInMonth.length];
-                                    plusSaveCount = plusPressedCount;
-
-                                    int year = firstDay.year;
-                                    int month = firstDay.month;
-                                    int day = plusSaveCount + 1;
-                                    ref.watch(setYearProvider.notifier).state = year;
-                                    ref.watch(setMonthProvider.notifier).state = month;
-                                    ref.watch(setDayProvider.notifier).state = day;
-                                    ref.watch(judgeWeekPopProvider.notifier).state = DateTime(year, month, day).weekday;
-
-                                    if (textColor == Colors.red) {
-                                      ref.watch(holidayJudgeProvider.notifier).state = true;
-                                    }else {
-                                      ref.watch(holidayJudgeProvider.notifier).state = false;
-                                    }
-                                    popupController(context,ref);
-                                  },
-                                ),                        
+                                  Container(
+                                    child: CalendarFunc(ref, dateCalen),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

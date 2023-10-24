@@ -23,19 +23,37 @@ Widget buildScheduleList(WidgetRef ref, DateTime firstDateController) {
                   onPressed: () async{
                     final scheduleDataList =  await ref.watch(scheduleListDateProvider(firstDateController).future);
                     final banana = scheduleDataList[index];
+
+
+
+                    //これは、view用であり、コントローラーで使ってはならない。
+                    final lemon = ref.watch(popupChangeValProvider.notifier);
+                    lemon.initialize(
+                      banana.id,
+                      banana.title,
+                      banana.endDay, 
+                      banana.content, 
+                      banana.judge,
+                    );
+
                     Future.delayed(Duration.zero, () {
                       Navigator.push(
                         context,
-                        CupertinoPageRoute(builder: (context) => PopChangeScreen(
-                          index: banana.id,
-                          scheTitle: banana.title,
-                          scheEndDate: banana.endDay,
-                          scheContent: banana.content,
-                        )),
+                        CupertinoPageRoute(builder: (context) => const PopChangeWidget(),
+                      ),
                       );
+
+
+                  //あとでNotifierに書き換える！！！！！！
+
                       ref.watch(scheStartDataChangeProvider.notifier).state = DateTime.parse(banana.startDay).toString();
                       ref.watch(scheEndDataChangeProvider.notifier).state = DateTime.parse(banana.endDay).toString();
-                      // ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(banana.startDay);
+                      ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(banana.startDay);
+                      ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime.parse(banana.endDay);
+                      ref.watch(scheEndDateInitialShowProvider.notifier).state = DateTime.parse(banana.endDay);
+                      final initTime = DateTime.parse(banana.startDay);
+                      ref.watch(scheEndDateMinimunShowProvider.notifier).state = DateTime(initTime.year, initTime.month, initTime.day, initTime.hour+1);
+
                       ref.watch(databaseGetDateProvider.notifier).state = banana.date;
                       final fruits = DateTime.parse(banana.startDay);
                       final fruits2 = DateTime.parse(banana.endDay);
@@ -53,7 +71,6 @@ Widget buildScheduleList(WidgetRef ref, DateTime firstDateController) {
                         fruits2.hour,
                         fruits2.minute,
                       );
-                      ref.watch(switchChangeProvider.notifier).state = banana.judge;
                     });
                   },
                   child: Row(

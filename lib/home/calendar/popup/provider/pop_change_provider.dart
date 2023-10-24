@@ -20,7 +20,7 @@ final commentEditingProvider =
 });
 
 final switchChangeProvider = StateProvider<bool>((ref) => false);
-final conditionJudgeChangeProvider = StateProvider<bool>((ref) => false);
+final conditionJudgeChangeProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 final popSelectedChangeStartDateProvider =
     FutureProvider.family<String, String>((ref, scheStartDate) async {
@@ -117,6 +117,9 @@ final scheEndDataChangeProvider = StateProvider<String>((ref) => '');
 final scheStartDateChangeShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final scheEndDateChangeShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
+final scheEndDateInitialShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final scheEndDateMinimunShowProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
 final dateTimeJudgeChangeProvider = NotifierProvider<DateTimeJudgeChangeNotifier, DateTime>(DateTimeJudgeChangeNotifier.new);
 class DateTimeJudgeChangeNotifier extends Notifier <DateTime>{
 
@@ -132,3 +135,105 @@ class DateTimeJudgeChangeNotifier extends Notifier <DateTime>{
 }
 
 final databaseGetDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
+
+
+final saveJudgeProvider = NotifierProvider<SaveJudgeNotifier, SaveJudgeState>(SaveJudgeNotifier.new);
+
+class SaveJudgeNotifier extends Notifier<SaveJudgeState> {
+  @override
+  build() {
+    return SaveJudgeState();
+  }
+
+  changeSaveJudge(bool newValue) {
+    state = state.copyWith(judge: newValue);
+  }
+}
+
+class SaveJudgeState {
+  final bool saveJudge;
+
+  SaveJudgeState({
+    this.saveJudge = false,
+  });
+
+  SaveJudgeState copyWith({
+    bool? judge,
+  }) {
+    return SaveJudgeState(
+      saveJudge: judge ?? saveJudge,
+    );
+  }
+}
+
+final popupChangeValProvider = NotifierProvider<PopupChangeValNotifier, PopupChangeValState>(PopupChangeValNotifier.new);
+
+class PopupChangeValNotifier extends Notifier<PopupChangeValState> {
+  @override
+  build() {
+    return PopupChangeValState();
+  }
+
+  void initialize(int newId, String newScheTitle, String newScheEndDate, String newScheContent, bool newJudge) {
+    state = state.copyWith(newId: newId, newScheTitle: newScheTitle, newScheEndDate: newScheEndDate, newScheContent: newScheContent, newJudge: newJudge);
+  }
+  // void changeIndex(int newValue) {
+  //   state = state.copyWith(newIndex: newValue);
+  // }
+
+  // void changeScheTitle(String newValue) {
+  //   state = state.copyWith(newScheTitle: newValue);
+  // }
+
+  // void changeScheEndDate(String newValue) {
+  //   state = state.copyWith(newScheEndDate: newValue);
+  // }
+
+  // void changeScheContent(String newValue) {
+  //   state = state.copyWith(newScheContent: newValue);
+  // }
+
+  // void changeJudge(bool newValue) {
+  //   state = state.copyWith(newJudge: newValue);
+  // }
+
+}
+
+class PopupChangeValState {
+  final int id;
+  final String scheTitle;
+  final String scheEndDate;
+  final String scheContent;
+  final bool judge;
+
+  PopupChangeValState({
+    this.id = 0,
+    this.scheTitle = '',
+    this.scheEndDate = '',
+    this.scheContent = '',
+    this.judge = false,
+  });
+
+  PopupChangeValState copyWith({
+    int? newId,
+    String? newScheTitle,
+    String? newScheEndDate,
+    String? newScheContent,
+    bool? newJudge,
+  }) {
+    return PopupChangeValState(
+      id: newId ?? id,
+      scheTitle: newScheTitle ?? scheTitle,
+      scheEndDate: newScheEndDate ?? scheEndDate,
+      scheContent: newScheContent ?? scheContent,
+      judge: newJudge ?? judge,
+    );
+  }
+}
+
+final appleProvider = StateProvider.autoDispose<bool>((ref) => false);
+final apple2Provider = StateProvider.autoDispose<bool>((ref) => false);
+final apple3Provider = StateProvider.autoDispose<bool>((ref) => false);
+final apple4Provider = StateProvider.autoDispose<bool>((ref) => false);
+final apple5Provider = StateProvider.autoDispose<bool>((ref) => false);
