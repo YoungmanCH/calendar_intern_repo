@@ -8,7 +8,7 @@ final queryexecutor = connectionDatabase();
 final database = ScheduleDatabase(queryexecutor);
 
 Future scheJudgeFunc(WidgetRef ref, DateTime firstDateController) async{        
-  await database.getSchedule().then((data){
+  await database.getScheduleList().then((data){
     final dates = data.map((record) => record.date).toList();  
     if (dates.contains(firstDateController)) {
       ref.watch(scheExistJudgeProvider.notifier).state = true;
@@ -16,6 +16,31 @@ Future scheJudgeFunc(WidgetRef ref, DateTime firstDateController) async{
       ref.watch(scheExistJudgeProvider.notifier).state = false;
     }
   });
+}
+
+Future <bool> scheJudgeFunc2(WidgetRef ref, DateTime firstDateController) async{  
+  bool judge = false;      
+  await database.getScheduleList().then((data){
+    final dates = data.map((record) => record.date).toList();  
+    //cast<>　で型を変換する。
+    final hasData = dates.cast<DateTime>().any((element) => element.day == firstDateController.day && element.year == firstDateController.year && element.month == firstDateController.month);
+
+    if (hasData) {
+      ref.watch(scheExistJudgeProvider.notifier).state = true;
+      judge = true;
+    }else {
+      ref.watch(scheExistJudgeProvider.notifier).state = false;
+      judge = false;
+    }
+    // if (dates.contains(firstDateController)) {
+    //   ref.watch(scheExistJudgeProvider.notifier).state = true;
+    //   judge = true;
+    // }else {
+    //   ref.watch(scheExistJudgeProvider.notifier).state = false;
+    //   judge = false;
+    // }
+  });
+  return judge;
 }
 
 //祝日の際のカラー設定

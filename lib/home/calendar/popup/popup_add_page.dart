@@ -90,69 +90,39 @@ class PopAddScreen extends ConsumerWidget {
             ],
           ),
         ),
-        body: Localizations.override(
-          context: context,
-          locale: const Locale('ja'),
-          child: Center(
-            child: Container(
-              color: const Color.fromARGB(248, 235, 234, 234),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: SizedBox(
-                      width: 400,
-                      height: 60,
-                      child: CupertinoTextField(
-                        placeholder: 'タイトルを入力してください',
-                        controller: ref.watch(titleAddProvider('')),
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: Localizations.override(
+            context: context,
+            locale: const Locale('ja'),
+            child: Center(
+              child: Container(
+                color: const Color.fromARGB(248, 235, 234, 234),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: SizedBox(
+                        width: 400,
+                        height: 60,
+                        child: CupertinoTextField(
+                          placeholder: 'タイトルを入力してください',
+                          controller: ref.watch(titleAddProvider('')),
+                          autofocus: true,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40, right: 10, left: 10),
-                    child: Container(
-                      width: 600,
-                      height: 180,
-                      color: Colors.white,
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: Color.fromARGB(248, 235, 234, 234),
-                                  width: 1.0,
-                                ),
-                              ),
-                            ),
-                            child: SizedBox(
-                              height: 55,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 15),
-                                    child: Text(
-                                      '終日',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  Switch(
-                                    value: ref.watch(switchProvider),
-                                    onChanged: (value) {
-                                      ref.watch(switchProvider.notifier).state = value;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 60,
-                            child: Container(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 40, right: 10, left: 10),
+                      child: Container(
+                        width: 600,
+                        height: 180,
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Container(
                               decoration: const BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
@@ -161,12 +131,80 @@ class PopAddScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
+                              child: SizedBox(
+                                height: 55,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Text(
+                                        '終日',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: ref.watch(switchProvider),
+                                      onChanged: (value) {
+                                        ref.watch(switchProvider.notifier).state = value;
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 60,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Color.fromARGB(248, 235, 234, 234),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                ),
+                                child: CupertinoButton(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        '開始',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        )
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 15),
+                                        child: FutureBuilder(
+                                          future: getStartTimeScheFunc(ref),
+                                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                            if (snapshot.hasData) {
+                                              Future.delayed(Duration.zero, () {
+                                                ref.watch(scheStartDateShowProvider.notifier).state = DateTime.parse(snapshot.data);
+                                              });
+                                            }
+                                            return Text(snapshot.data.toString());
+                                          }
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () => startDatePickerFunc(context, ref, popSelected, mode),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 60,
                               child: CupertinoButton(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      '開始',
+                                      '終了',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
@@ -175,11 +213,11 @@ class PopAddScreen extends ConsumerWidget {
                                     Padding(
                                       padding: const EdgeInsets.only(left: 15),
                                       child: FutureBuilder(
-                                        future: getStartTimeScheFunc(ref),
+                                        future: getEndTimeScheFunc(ref),
                                         builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                          if (snapshot.hasData) {
+                                          if(snapshot.hasData) {
                                             Future.delayed(Duration.zero, () {
-                                              ref.watch(scheStartDateShowProvider.notifier).state = DateTime.parse(snapshot.data);
+                                              ref.watch(scheEndDateShowProvider.notifier).state = DateTime.parse(snapshot.data);
                                             });
                                           }
                                           return Text(snapshot.data.toString());
@@ -188,61 +226,29 @@ class PopAddScreen extends ConsumerWidget {
                                     ),
                                   ],
                                 ),
-                                onPressed: () => startDatePickerFunc(context, ref, popSelected, mode),
+                                onPressed: () => endDatePickerFunc(context, ref, popSelected, mode),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 60,
-                            child: CupertinoButton(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    '終了',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    )
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 15),
-                                    child: FutureBuilder(
-                                      future: getEndTimeScheFunc(ref),
-                                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                        if(snapshot.hasData) {
-                                          Future.delayed(Duration.zero, () {
-                                            ref.watch(scheEndDateShowProvider.notifier).state = DateTime.parse(snapshot.data);
-                                          });
-                                        }
-                                        return Text(snapshot.data.toString());
-                                      }
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              onPressed: () => endDatePickerFunc(context, ref, popSelected, mode),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Container(
-                      color: Colors.white,
-                      width: 400,
-                      height: 160,
-                      child: CupertinoTextField(
-                        placeholder: 'コメントを入力してください',
-                        maxLines: 6,
-                        controller: ref.read(commentAddProvider('')),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        color: Colors.white,
+                        width: 400,
+                        height: 160,
+                        child: CupertinoTextField(
+                          placeholder: 'コメントを入力してください',
+                          maxLines: 6,
+                          controller: ref.read(commentAddProvider('')),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),     
+                  ],
+                ),     
+              ),
             ),
           ),
         ),

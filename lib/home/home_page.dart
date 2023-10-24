@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerWidget {
     DateTime firstDayController = ref.read(firstDayProvider);
     DateTime lastDayController = ref.read(lastDayProvider);
 
-    return CupertinoApp(
+    return MaterialApp(
       home: CupertinoPageScaffold(
         navigationBar: const CupertinoNavigationBar(
           middle: Text('カレンダー', style: TextStyle(color: Colors.white,)),
