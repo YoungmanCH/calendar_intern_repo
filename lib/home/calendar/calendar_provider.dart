@@ -15,6 +15,8 @@ final firstDayMonthProvider = Provider.family<String, DateTime>((ref, firstDay) 
   return '${firstDay.year.toString()}年${firstDay.month.toString()}月'; 
 });
 
+final setDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
 final selectedMonthProvider = StateProvider<String>((ref) => '');
 final selectedYearProvider = StateProvider<int>((ref) => DateTime.now().year);
 final selectedYearProvider2 = Provider.family<int, DateTime>((ref, firstDay) => firstDay.year);
