@@ -53,40 +53,43 @@ void startDatePickerFunc(BuildContext context, WidgetRef ref,
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: CupertinoButton(
-                        child: const Text(
-                          'キャンセル',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16,
-                          ),
+                      child: const Text(
+                        'キャンセル',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16,
                         ),
-                        onPressed: () {
-                          Navigator.pop(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) =>
-                                    PopAddScreen(popSelected: popSelected),
-                              ));
-                        }),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => PopAddScreen(popSelected: popSelected),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 10),
                     child: CupertinoButton(
-                        child: const Text(
-                          '完了',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16,
-                          ),
+                      child: const Text(
+                        '完了',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16,
                         ),
-                        onPressed: () {
-                          Navigator.pop(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) =>
-                                    PopAddScreen(popSelected: popSelected),
-                              ));
-                        }),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(
+                          context,
+                            CupertinoPageRoute(
+                              builder: (context) =>
+                                  PopAddScreen(popSelected: popSelected),
+                            )
+                        );
+                      }
+                    ),
                   ),
                 ],
               ),

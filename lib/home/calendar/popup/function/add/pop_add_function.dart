@@ -48,6 +48,8 @@ void newTimeStartFunc(WidgetRef ref, DateTime newTime) {
   String day = newTime.day.toString();
   String hour = newTime.hour.toString();
   String minute = newTime.minute.toString();
+
+
   if (newTime.month < 10) {
     month = '0$month';
   }
@@ -62,13 +64,37 @@ void newTimeStartFunc(WidgetRef ref, DateTime newTime) {
   }
   ref.watch(scheStartDataProvider.notifier).state =
       '${newTime.year}-$month-$day $hour:$minute';
+
+    if (ref.watch(scheEndDateShowProvider).isBefore(newTime)) {
+      ref.watch(scheEndDateShowProvider.notifier).state = DateTime(
+        newTime.year,
+        newTime.month,
+        newTime.day,
+        newTime.hour+1,
+        newTime.minute,
+      );
+    }
+    if (!ref.watch(switchProvider)) {
+      if (ref.watch(scheEndDateShowProvider) == newTime) {
+        ref.watch(scheEndDateShowProvider.notifier).state = DateTime(
+          newTime.year,
+          newTime.month,
+          newTime.day,
+          newTime.hour+1,
+          newTime.minute,
+        );
+      }
+    }
 }
 
 void newTimeEndFunc(WidgetRef ref, DateTime newTime) {
   String month = newTime.month.toString();
+
+  ref.watch(scheEndDateShowProvider.notifier).state = newTime;  
   String day = newTime.day.toString();
   String hour = (newTime.hour).toString();
   String minute = newTime.minute.toString();
+
   if (newTime.month < 10) {
     month = '0$month';
   }

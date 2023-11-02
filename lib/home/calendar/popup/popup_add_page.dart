@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../home_page.dart';
 import '../../../database/database.dart';
+import 'provider/pop_show_provider.dart';
 import 'provider/pop_add_provider.dart';
 import 'function/add/pop_add_function.dart';
 import 'function/add/pop_add_widget.dart';
 
 //現在の問題は、ロールリストが日本語表記になっていない点である。
+
+//pop_add_page.dart
+// ConsumerStatefulWidget     //class PopAddPage
+// ConsumerState              //class PopAddState
 
 class PopAddScreen extends ConsumerWidget {
   final DateTime popSelected;
@@ -56,7 +61,7 @@ class PopAddScreen extends ConsumerWidget {
                 child: CupertinoButton(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
                   color: Colors.white,
-                  disabledColor: const Color.fromARGB(248, 179, 179, 179),    
+                  disabledColor: const Color.fromARGB(248, 217, 215, 215),    
                   onPressed: ref.watch(conditionJudgeProvider) == false ? null : () async{
                     Navigator.push(context, CupertinoPageRoute(builder: (context) => const HomeScreen()));
                     final dateSche = DateTime.parse(await ref.watch(popSelectedStartDateProvider(popSelected.toString()).future));
@@ -70,6 +75,7 @@ class PopAddScreen extends ConsumerWidget {
                       datetimeJudgement,
                       ref.watch(switchProvider),
                     );
+                    ref.invalidate(scheduleFromDatetimeProvider);
                     ref.read(scheStartDataProvider.notifier).state = '';
                     ref.read(scheEndDataProvider.notifier).state = '';
                     ref.read(scheStartDateShowProvider.notifier).state = DateTime.now();
@@ -80,8 +86,8 @@ class PopAddScreen extends ConsumerWidget {
                   },
                   child: const Text(
                     '保存', 
-                    style: TextStyle(
-                      color: Colors.black,
+                    style: TextStyle( 
+                      color:  Colors.black,
                       fontSize: 12,
                     )
                   ),
@@ -212,17 +218,31 @@ class PopAddScreen extends ConsumerWidget {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(left: 15),
-                                      child: FutureBuilder(
-                                        future: getEndTimeScheFunc(ref),
-                                        builder: (BuildContext context, AsyncSnapshot snapshot) {
-                                          if(snapshot.hasData) {
-                                            Future.delayed(Duration.zero, () {
-                                              ref.watch(scheEndDateShowProvider.notifier).state = DateTime.parse(snapshot.data);
-                                            });
-                                          }
-                                          return Text(snapshot.data.toString());
-                                        }
-                                      ),
+                                      //ref.watch(scheEndDateShowProvider.select((date) これによって、scheEndSelaftedShowProviderの値を引数によって受け渡すことができる。
+                                      child: Text(ref.watch(scheEndDateShowProvider.select((date) {
+                                          var year = date.year.toString();
+                                          var month = date.month.toString();
+                                          var day = date.day.toString();
+                                          var hour = date.hour.toString();
+                                          var minute = date.minute.toString();
+                                            if (date.month < 10) {
+                                              month = '0$month';
+                                            }
+                                            if (date.day < 10) {
+                                              day = '0$day';
+                                            }
+                                            if (date.hour < 10) {
+                                              hour = '0$hour';
+                                            }
+                                            if (date.minute < 10) {
+                                              minute = '0$minute';
+                                            }
+                                            if (ref.watch(switchProvider)) {
+                                              return '$year-$month-$day';
+                                           }
+                                          final datetimeData = '${date.year}-$month-$day $hour:$minute';
+                                          return datetimeData;
+                                      }))),
                                     ),
                                   ],
                                 ),

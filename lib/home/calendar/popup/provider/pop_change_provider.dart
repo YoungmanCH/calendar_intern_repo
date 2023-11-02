@@ -29,6 +29,7 @@ final popSelectedChangeStartDateProvider =
   if (scheStartData != '') {
     datetimeStart = DateTime.parse(scheStartData);
   }
+
   int yearInit = datetimeStart.year;
   int monthInit = datetimeStart.month;
   int dayInit = datetimeStart.day;
@@ -77,6 +78,46 @@ final popSelectedChangeEndDateProvider =
   if (scheEndData != '') {
     datetimeEnd = DateTime.parse(scheEndData);
   }
+
+//----------------ここからーーーーーーーー
+  if (!ref.watch(switchChangeProvider)) {
+    if (ref.watch(scheStartDateChangeShowProvider) == datetimeEnd) {
+      final dateTime = ref.watch(scheStartDateChangeShowProvider);
+      datetimeEnd = DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        dateTime.hour+1,
+        dateTime.minute,
+      );
+      ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        dateTime.hour+1,
+        dateTime.minute,
+      );
+    }
+    if (datetimeEnd.isBefore(ref.watch(scheStartDateChangeShowProvider))) {
+      final dateTime = ref.watch(scheStartDateChangeShowProvider);
+      datetimeEnd = DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        dateTime.hour+1,
+        dateTime.minute,
+      );
+      ref.watch(scheEndDateChangeShowProvider.notifier).state = DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+        dateTime.hour+1,
+        dateTime.minute,
+      );
+    }
+  }
+  //---------------ここまで、future系のエラーが発生してしまっている。ーーーーーーーーー
+
   int yearInit = datetimeEnd.year;
   int monthInit = datetimeEnd.month;
   int dayInit = datetimeEnd.day;
@@ -129,15 +170,11 @@ class DateTimeJudgeChangeNotifier extends Notifier <DateTime>{
   }
 
   updateDateTime(int year, int month, int day, int hour, int minute) {
-    // state = DateTime(year, month, day, hour, minute);
     return DateTime(year, month, day, hour, minute);
   }
 }
 
 final databaseGetDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
-
-
-
 final saveJudgeProvider = NotifierProvider<SaveJudgeNotifier, SaveJudgeState>(SaveJudgeNotifier.new);
 
 class SaveJudgeNotifier extends Notifier<SaveJudgeState> {
@@ -178,26 +215,6 @@ class PopupChangeValNotifier extends Notifier<PopupChangeValState> {
   void initialize(int newId, String newScheTitle, String newScheEndDate, String newScheContent, bool newJudge) {
     state = state.copyWith(newId: newId, newScheTitle: newScheTitle, newScheEndDate: newScheEndDate, newScheContent: newScheContent, newJudge: newJudge);
   }
-  // void changeIndex(int newValue) {
-  //   state = state.copyWith(newIndex: newValue);
-  // }
-
-  // void changeScheTitle(String newValue) {
-  //   state = state.copyWith(newScheTitle: newValue);
-  // }
-
-  // void changeScheEndDate(String newValue) {
-  //   state = state.copyWith(newScheEndDate: newValue);
-  // }
-
-  // void changeScheContent(String newValue) {
-  //   state = state.copyWith(newScheContent: newValue);
-  // }
-
-  // void changeJudge(bool newValue) {
-  //   state = state.copyWith(newJudge: newValue);
-  // }
-
 }
 
 class PopupChangeValState {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../home_page.dart';
 import '../../../database/database.dart';
+import 'provider/pop_show_provider.dart';
 import 'provider/pop_change_provider.dart';
 import 'function/change/pop_change_function.dart';
 import 'function/change/pop_change_widget.dart';
@@ -53,7 +54,9 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
 
     //build後に実行される。どうしてもbuild内でProviderの状態を変更したい場合に用いる。
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) =>  textSettingFunc(ref, scheTitle, scheContent),
+      (_) {
+        textSettingFunc(ref, scheTitle, scheContent);
+      },
     );
   
 
@@ -110,6 +113,7 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                       datetimeJudgement, 
                       ref.watch(switchChangeProvider.notifier).state,
                     );
+                    ref.invalidate(scheduleFromDatetimeProvider);
                   },       
                   child: const Text(
                     '保存', 
@@ -141,7 +145,6 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                         child: CupertinoTextField(
                           // placeholder: 'タイトルを入力してください',
                           autofocus: true,
-                          // focusNode: focusNode,
                           controller: ref.watch(titleEditingProvider(scheTitle)),
                         ),  
                       ),
@@ -179,7 +182,7 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                                     ),
                                     Switch(
                                       value: ref.watch(switchChangeProvider),
-                                      onChanged: (value) {
+                                      onChanged: (value) async{
                                         ref.watch(switchChangeProvider.notifier).state = value;
                                       },
                                     ),
@@ -216,7 +219,6 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                                                 ref.watch(scheStartDateChangeShowProvider.notifier).state = DateTime.parse(snapshot.data);
                                               });
                                             }
-                                            print('timeStart: ${snapshot.data}');
                                             return Text(snapshot.data.toString());
                                           }
                                         ),    
@@ -302,7 +304,9 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                               color: CupertinoColors.systemRed,
                             ),
                           ),
-                          onPressed: () => deleteScheduleFunc(context, ref),
+                          onPressed: () {
+                            deleteScheduleFunc(context, ref);
+                          }
                         ),
                       ),
                     ),

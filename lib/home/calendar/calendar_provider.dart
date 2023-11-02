@@ -3,10 +3,12 @@ import 'package:holiday_jp/holiday_jp.dart' as holiday_jp;
 
 //祝日判定は、どうしても手間がかかるため、外部パッケージを使わせていただきました。
 
-final monthNumberProvider = Provider<List<int>>((ref) {
-  return List.generate(12, (index) => index+1);
-});
-final selectedMonthStringProvider = StateProvider<String>((ref) => ''); 
+// final monthNumberProvider = Provider<List<int>>((ref) {
+//   return List.generate(12, (index) => index+1);
+// });
+// final selectedMonthStringProvider = StateProvider<String>((ref) => ''); 
+
+final selectedCountMonthProvider = StateProvider<int>((ref) => DateTime.now().month);
 
 final firstDayMonthProvider = Provider.family<String, DateTime>((ref, firstDay) {
   if (firstDay.month < 10) {
