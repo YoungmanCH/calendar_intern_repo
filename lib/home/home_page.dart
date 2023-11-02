@@ -2,8 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home_provider.dart';
+import 'calendar/calendar_provider.dart';
 import 'calendar/calendar_page.dart';
+import 'home_function.dart';
 
+
+//pageView.builderはProviderで管理してはいけない。使いまわしたい場合は、クラスで継承させるように！
 class HomeWidget extends StatelessWidget {
   const HomeWidget({super.key});
   @override
@@ -19,10 +23,13 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    final PageController pageController = ref.read(pageControllerProvider);
+    final selectedMonth = getElapsedMonths(ref.watch(setDateProvider));
     DateTime firstDayController = ref.read(firstDayProvider);
     DateTime lastDayController = ref.read(lastDayProvider);
+
+    final pageController = PageController(
+      initialPage: ref.watch(homePageIndexProvider),
+    );
 
     return MaterialApp(
       home: CupertinoPageScaffold(
@@ -33,18 +40,16 @@ class HomeScreen extends ConsumerWidget {
         child: PageView.builder(
           controller: pageController,
           onPageChanged: (int page) {
-            ref.read(currentPageProvider.notifier).state = page;
+            ref.watch(selectedCountMonthProvider.notifier).state = page;
+            ref.watch(selectedDatePageProvider.notifier).state = getYearFromElapsedMonths(ref.watch(selectedCountMonthProvider));
+            ref.watch(homePageIndexProvider.notifier).state = page;
           },
           itemBuilder: (context, index) {
-            DateTime currentDate = DateTime(
-              DateTime.now().year, 
-              index + 1, 
-              1,
-            );
+            final currentDate = getYearFromElapsedMonths(index);
 
             firstDayController = DateTime(
               currentDate.year, 
-              currentDate.month, 
+              currentDate.month,
               1,
             );
 
@@ -55,9 +60,10 @@ class HomeScreen extends ConsumerWidget {
             );
 
             return CalendarScreen(
+              selectedMonth: selectedMonth,
               firstDay: firstDayController, 
               lastDay: lastDayController, 
-              pageController: pageController
+              pageController: pageController,
             );
           }
         ),

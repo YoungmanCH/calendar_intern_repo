@@ -42,10 +42,18 @@ class ScheduleDatabase extends _$ScheduleDatabase {
     return select(scheduleTable).get();
   }
 
-  Future<ScheduleRecord> getSchedule(int id) async {
-    final result =
-        await (select(scheduleTable)..where((t) => t.id.equals(id))).getSingle();
+  Future<ScheduleRecord?> getSchedule(int id) async {
+    final result = await (select(scheduleTable)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
     return result;
+  }
+
+  Future<List<ScheduleRecord>> getScheduleListFromDateTime(
+      DateTime datetime) async {
+    final results = await (select(scheduleTable)
+          ..where((t) => t.date.equals(datetime)))
+        .get();
+    return results;
   }
 
   Future<List<ScheduleRecord>> getScheduleListDate(

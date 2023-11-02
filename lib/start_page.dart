@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home/home_page.dart';
+import 'home/home_function.dart';
+import 'home/home_provider.dart';
+import 'home/calendar/calendar_provider.dart';
 
 class StartWidget extends StatelessWidget {
   const StartWidget({super.key});
@@ -51,7 +54,9 @@ class StartScreen extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 18,
                           )),
-                      onPressed: () => Navigator.pushNamed(context, '/home'),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/home');
+                      },
                     ),
                   ),
                 ),

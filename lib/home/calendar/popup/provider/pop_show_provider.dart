@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../database/database.dart';
 
+//autoDisposeを使うと、この場合、毎回データベースから取得する
+final scheduleFromDatetimeProvider =
+    FutureProvider.family.autoDispose<List<ScheduleRecord>, DateTime>((ref, datetime) {
+  final db = ref.read(databaseProvider);
+  return db.getScheduleListFromDateTime(datetime);
+});
+
 final weekPopProvider = StateProvider<String>((ref) => '');
 final weekColorProvider = StateProvider<Color>((ref) => Colors.black);
 final judgeWeekPopProvider = StateProvider<int>((ref) => 0);
@@ -13,10 +20,17 @@ final selectedWeekdayProvider =
 final selectedWeekdayStringProvider = StateProvider<String>((ref) => '');
 final selectedWeekColorProvider = StateProvider<Color>((ref) => Colors.black);
 
-final pageControllerProvider2 = Provider<PageController>((ref) {
-  final currentPage = DateTime.now().month - 1;
-  return PageController(initialPage: currentPage);
+final pageControllerProvider2 = Provider.family<PageController, int>((ref, index) {
+  final currentPage = index;
+  // return PageController(initialPage: currentPage);
+  return PageController(initialPage: currentPage, viewportFraction: 0.9);
 });
+
+final changeIndexProvider = StateProvider<int>((ref) => 0);
+// final pageControllerProvider2 = Provider<PageController>((ref) {
+//   final currentPage = DateTime.now().month - 1;
+//   return PageController(initialPage: currentPage, viewportFraction: 0.9);
+// });
 
 final firstDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final scheExistJudgeProvider = StateProvider<bool>((ref) => false);
