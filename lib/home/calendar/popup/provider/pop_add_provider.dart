@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+final isTitleFocusedProvider = StateProvider<bool>((ref) => true);
+final isCommentFocusedProvider = StateProvider<bool>((ref) => false);
+
 final switchProvider = StateProvider<bool>((ref) => false);
 final titleAddProvider =
     Provider.family<TextEditingController, String>((ref, scheTitle) {

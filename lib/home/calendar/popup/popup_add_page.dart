@@ -24,7 +24,7 @@ class PopAddScreen extends ConsumerWidget {
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       textSettingFunc(ref, '', ''); 
     });
     CupertinoDatePickerMode mode = CupertinoDatePickerMode.dateAndTime;      
@@ -110,13 +110,36 @@ class PopAddScreen extends ConsumerWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
-                      child: SizedBox(
-                        width: 400,
-                        height: 60,
-                        child: CupertinoTextField(
-                          placeholder: 'タイトルを入力してください',
-                          controller: ref.watch(titleAddProvider('')),
-                          autofocus: true,
+                      child: Container(
+                        color: Colors.white,
+                        child: Focus(
+                          onFocusChange: (hasFocus) {
+                            if (hasFocus) {
+                              ref.read(isTitleFocusedProvider.notifier).state = true;
+                            } else {
+                              ref.read(isTitleFocusedProvider.notifier).state = false;
+                            }
+                          },
+                          child: Container(
+                            width: 400,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: ref.watch(isTitleFocusedProvider) ? Colors.blue : Colors.transparent,
+                              ),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: TextFormField(
+                              controller: ref.watch(titleAddProvider('')),
+                              autofocus: true,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                hintText: 'タイトルを入力してください',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -257,12 +280,34 @@ class PopAddScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(top: 10),
                       child: Container(
                         color: Colors.white,
-                        width: 400,
-                        height: 160,
-                        child: CupertinoTextField(
-                          placeholder: 'コメントを入力してください',
-                          maxLines: 6,
-                          controller: ref.read(commentAddProvider('')),
+                        child: Focus(
+                          onFocusChange: (hasFocus) {
+                            if (hasFocus) {
+                              ref.read(isCommentFocusedProvider.notifier).state = true;
+                            }else {
+                              ref.read(isCommentFocusedProvider.notifier).state = false;
+                            }
+                          },
+                          child: Container(
+                            width: 400,
+                            height: 160,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: ref.watch(isCommentFocusedProvider) ? Colors.blue : Colors.transparent,
+                              ),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: TextFormField(
+                              controller: ref.read(commentAddProvider('')),
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                hintText: 'コメントを入力してください',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),

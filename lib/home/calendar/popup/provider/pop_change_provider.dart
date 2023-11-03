@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../database/database.dart';
 
+final isTitleFocusedProvider = StateProvider<bool>((ref) => true);
+final isCommentFocusedProvider = StateProvider<bool>((ref) => false);
+
 final scheTitleListProvider =
     FutureProvider.family<List, DateTime>((ref, firstDate) async {
   final database = ref.watch(databaseProvider);
