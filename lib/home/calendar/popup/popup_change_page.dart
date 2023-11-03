@@ -139,14 +139,37 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
-                      child: SizedBox(
-                        width: 400,
-                        height: 60,
-                        child: CupertinoTextField(
-                          // placeholder: 'タイトルを入力してください',
-                          autofocus: true,
-                          controller: ref.watch(titleEditingProvider(scheTitle)),
-                        ),  
+                      child: Container(
+                        color: Colors.white,
+                        child: Focus(
+                          onFocusChange: (hasFocus) {
+                            if (hasFocus) {
+                              ref.read(isTitleFocusedProvider.notifier).state = true;
+                            } else {
+                              ref.read(isTitleFocusedProvider.notifier).state = false;
+                            }
+                          },
+                          child: Container(
+                            width: 400,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: ref.watch(isTitleFocusedProvider) ? Colors.blue : Colors.transparent,
+                              ),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: TextFormField(
+                              controller: ref.watch(titleEditingProvider(scheTitle)),
+                              autofocus: true,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                hintText: 'タイトルを入力してください',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
@@ -281,12 +304,34 @@ class PopChangeScreen extends ConsumerState<PopChangeWidget> {
                       padding: const EdgeInsets.only(top: 10),
                       child: Container(
                         color: Colors.white,
-                        width: 400,
-                        height: 160,
-                        child: CupertinoTextField(
-                          // placeholder: 'コメントを入力してください',
-                          controller: ref.watch(commentEditingProvider(scheContent)),
-                          maxLines: 6,
+                        child: Focus(
+                          onFocusChange: (hasFocus) {
+                            if (hasFocus) {
+                              ref.read(isCommentFocusedProvider.notifier).state = true;
+                            } else {
+                              ref.read(isCommentFocusedProvider.notifier).state = false;
+                            }
+                          },
+                          child: Container(
+                            width: 400,
+                            height: 160,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: ref.watch(isCommentFocusedProvider) ? Colors.blue : Colors.transparent,
+                              ),
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                            child: TextFormField(
+                              controller: ref.read(commentEditingProvider(scheContent)),
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                hintText: 'コメントを入力してください',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
