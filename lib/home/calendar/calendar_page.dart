@@ -157,7 +157,7 @@ class CalendarScreen extends ConsumerWidget {
                           color: Colors.grey,
                           width: 0.5,
                         ),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(25),
                       ),
                       child: CupertinoButton(
                         padding: const EdgeInsets.all(0),
@@ -165,7 +165,7 @@ class CalendarScreen extends ConsumerWidget {
                           '今日', 
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 12,
+                            fontSize: 15,
                           ),
                         ),
                         onPressed: () {
@@ -243,7 +243,7 @@ class CalendarScreen extends ConsumerWidget {
                         child: Text(
                           dayOfWeek[index].toString(),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             color: textColor,
                           ),
                         )
@@ -322,24 +322,19 @@ class CalendarScreen extends ConsumerWidget {
                           color: Colors.white,
                           child: Align(
                             alignment: Alignment.center,
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
                               child: Center(
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: 35,
-                                      height: 35,
                                       decoration: BoxDecoration(
                                         color: backgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(25),
                                       ),
                                       child: TextButton(
                                         child: Text(
                                           dateInMonth[index % dateInMonth.length].toString(),
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 15,
                                             color: textColor,
                                           ),
                                         ),
@@ -369,7 +364,6 @@ class CalendarScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                            ),
                           ),
                         );
                       } else {
@@ -383,17 +377,17 @@ class CalendarScreen extends ConsumerWidget {
                             child: Container(
                               alignment: Alignment.topCenter,
                               padding: const EdgeInsets.only(top: 9),
-                              width: 50,
-                              height: 50,
+                              width: 52,
+                              height: 52,
                               decoration: BoxDecoration(
                                 color: backgroundColor,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(25),
                               ),
                               // child: Center(
                                 child: Text(
                                   dateInNextMonth[nextMonthIndex].toString(),
                                   style: const TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: Colors.grey
                                   ),
                                 // ),
@@ -413,17 +407,17 @@ class CalendarScreen extends ConsumerWidget {
                             child: Container(
                               alignment: Alignment.topCenter,
                               padding: const EdgeInsets.only(top: 9),
-                              width: 50,
-                              height: 50,
+                              width: 52,
+                              height: 52,
                               decoration: BoxDecoration(
                                 color: backgroundColor,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(25),
                               ),
                               // child: Center(
                                 child: Text(
                                   dateInLastMonth[dateInLastMonth.length + index - lateCount].toString(),
                                   style: const TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: Colors.grey,
                                   ),
                                 ),
@@ -476,24 +470,20 @@ class CalendarScreen extends ConsumerWidget {
                           color: Colors.white,
                           child: Align(
                             alignment: Alignment.center,
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,                              
+                            child: SizedBox(                            
                               child: Center(
                                 child: Column(
                                   children: [
                                     Container(
-                                      width: 35,
-                                      height: 35,
                                       decoration: BoxDecoration(
                                         color: backgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(25),
                                       ),
                                       child: TextButton(
                                         child: Text(
                                           dateInMonth[plusCount % dateInMonth.length].toString(),
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 15,
                                             color: textColor,
                                           ), 
                                         ),
@@ -537,17 +527,17 @@ class CalendarScreen extends ConsumerWidget {
                             child: Container(
                               alignment: Alignment.topCenter,
                               padding: const EdgeInsets.only(top: 9),
-                              width: 50,
-                              height: 50,
+                              width: 52,
+                              height: 52,
                               decoration: BoxDecoration(
                                 color: backgroundColor,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(25),
                               ),
                               // child: Center(
                                 child: Text(
                                   dateInNextMonth[nextMonthIndex].toString(),
                                   style: const TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: Colors.grey,
                                   ),
                                 ),
